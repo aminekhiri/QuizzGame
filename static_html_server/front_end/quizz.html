@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Culture Générale</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="quizz.css">
+  <script src="quizz.js" defer></script>
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Quiz Culture Générale</h1>
+
+    <div id="config">
+      <label for="category-select">Choisissez un thème :</label>
+      <select id="category-select">
+        <option value="" disabled selected>Chargement…</option>
+      </select><br><br>
+    
+      <label for="difficulty-select">Choisissez une difficulté :</label>
+      <select id="difficulty-select">
+        <option value="" disabled selected>Chargement…</option>
+      </select><br><br>
+    
+      <button id="start-btn">Lancer le quiz</button>
+    </div>
+
+
+    <div id="hud">
+      <span>Score : <strong id="score">0</strong></span>
+      <span>Temps restant : <strong id="timer">00</strong>s</span>
+    </div>
+  
+    
+
+    <div id="question-box" style="display:none;">
+      <p class="question">Question…</p>
+      <div class="answers"></div>
+      <button id="next-btn">Question suivante</button>
+    </div>
+  </div>
+</body>
+</html>
