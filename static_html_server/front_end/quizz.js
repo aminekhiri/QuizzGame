@@ -48,7 +48,7 @@ async function loadCategories() {
 
   const select = document.getElementById('category-select');
   select.innerHTML = '';
-  select.append(new Option('Toutes catégories',''));
+  select.append(new Option('All categories',''));
   merged.forEach(({ label, code, count }) => {
     select.append(new Option(`${label} (${count})`, code));
   });
@@ -58,7 +58,7 @@ function loadDifficulties() {
   const diffs = ['easy','medium','hard'];
   const select = document.getElementById('difficulty-select');
   select.innerHTML = '';
-  select.append(new Option('Toutes difficultés',''));
+  select.append(new Option('All difficulities',''));
   diffs.forEach(d => {
     select.append(new Option(d.charAt(0).toUpperCase()+d.slice(1), d));
   });
@@ -107,7 +107,22 @@ function showNextQuestion() {
     btn.textContent = ans;
     btn.addEventListener('click', () => {
       aEl.querySelectorAll('button').forEach(b => b.disabled = true);
-      if (ans === correct) btn.classList.add('correct');
+      if (ans === correct) {
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+      
+        // === mise à jour du bestScore pour la catégorie et la difficulté ===
+        const currentUser = localStorage.getItem('username') || '';
+        const catKey      = currentCategory   || 'all';
+        const diffKey     = currentDifficulty || 'all';
+        const storageKey  = `bestScore_${currentUser}_${catKey}_${diffKey}`;
+      
+        const prev = parseInt(localStorage.getItem(storageKey) || '0', 10);
+        if (score > prev) {
+          localStorage.setItem(storageKey, score.toString());
+        }
+      }
       else {
         btn.classList.add('wrong');
         aEl.querySelectorAll('button')
@@ -125,7 +140,7 @@ function showNextQuestion() {
 function startTimer() {
   clearInterval(timerInterval);
   const display = document.getElementById('timer');
-  timeLeft = DIFFICULTY_TIME[currentDifficulty] ?? DIFFICULTY_TIME.easy;
+  timeLeft = DIFFICULTY_TIME[currentDifficulty] ?? 20;
   display.textContent = timeLeft;
   timerInterval = setInterval(() => {
     timeLeft--;

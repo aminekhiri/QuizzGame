@@ -1,0 +1,101 @@
+/* register.css */
+
+/* Fond en dégradé violet/bleu */
+body {
+margin: 0;
+padding: 0;
+height: 100vh;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background: linear-gradient(135deg, #6a11cb, #2575fc);
+display: flex;
+justify-content: center;
+align-items: center;
+}
+
+/* Conteneur du formulaire en colonne */
+.form-container {
+display: flex;
+flex-direction: column;
+align-items: stretch;
+background: rgba(33, 24, 73, 0.85);
+padding: 2rem;
+border-radius: 12px;
+box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+width: 320px;
+color: #f0e9ff;
+}
+
+/* Titre */
+.form-container h1 {
+margin-bottom: 1.5rem;
+text-align: center;
+font-size: 1.8em;
+color: #fff;
+}
+
+/* Chaque label */
+.form-container label {
+margin-bottom: 0.25rem;
+font-weight: 500;
+font-size: 0.95em;
+}
+
+/* Champs de saisie (empilés) */
+.form-container input {
+width: 100%;
+padding: 0.6rem 0.8rem;
+margin-bottom: 1rem;
+border: none;
+border-radius: 6px;
+font-size: 1em;
+background-color: #f5f0ff;
+color: #333;
+transition: box-shadow 0.3s ease;
+}
+
+.form-container input:focus {
+outline: none;
+box-shadow: 0 0 8px #bb86fc;
+}
+
+/* Bouton d’inscription */
+.form-container button {
+width: 100%;
+padding: 0.8rem;
+margin-top: 0.5rem;
+border: none;
+border-radius: 6px;
+background-color: #7e57c2;
+color: white;
+font-size: 1em;
+font-weight: 600;
+cursor: pointer;
+transition: background-color 0.3s ease, transform 0.1s;
+}
+
+.form-container button:hover {
+background-color: #9575cd;
+transform: scale(1.02);
+}
+
+.form-container button:active {
+transform: scale(0.98);
+}
+
+/* Lien de redirection */
+.form-container p {
+text-align: center;
+font-size: 0.9em;
+margin-top: 1rem;
+}
+
+.form-container p a {
+color: #bb86fc;
+text-decoration: none;
+font-weight: 500;
+transition: color 0.2s ease;
+}
+
+.form-container p a:hover {
+color: #d1b3ff;
+}

@@ -2,7 +2,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('fond_fruit.webp') center/cover no-repeat;
+    background: url('login_image.png') center center no-repeat;
+    background-size: cover;
     color: #fff;
     display: flex;
     flex-direction: column;
@@ -58,4 +59,20 @@ button:hover {
 
 button:active {
     transform: scale(0.98);
+}
+
+#inscription {
+    background: none;
+    text-decoration: underline;
+
+}
+
+#forgot{
+    background: none;
+    text-decoration: underline;
+}
+
+#register-btn {
+    background: none;
+    text-decoration: underline;
 }

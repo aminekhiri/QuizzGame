@@ -2,33 +2,38 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quiz Culture Générale</title>
+  <title>General Knowledge Quiz</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="quizz.css">
   <script src="quizz.js" defer></script>
+  <link rel="icon" type="image/x-icon" href="brain.png">
+
 </head>
 <body>
   <div class="quiz-container">
-    <h1>Quiz Culture Générale</h1>
+    <h1>General Knowledge Quiz</h1>
+    <a href="profile.html" class="profile-link" title="My profile">My profile 👤</a>
 
     <div id="config">
-      <label for="category-select">Choisissez un thème :</label>
+      <label for="category-select">Choose a theme :</label>
       <select id="category-select">
-        <option value="" disabled selected>Chargement…</option>
+        <option value="" disabled selected>Loading…</option>
       </select><br><br>
     
-      <label for="difficulty-select">Choisissez une difficulté :</label>
+      <label for="difficulty-select">Choose a difficulty :</label>
       <select id="difficulty-select">
-        <option value="" disabled selected>Chargement…</option>
+        <option value="" disabled selected>Loading…</option>
       </select><br><br>
     
-      <button id="start-btn">Lancer le quiz</button>
+      <button id="start-btn">Start the quiz</button>
     </div>
 
 
     <div id="hud">
-      <span>Score : <strong id="score">0</strong></span>
-      <span>Temps restant : <strong id="timer">00</strong>s</span>
+      <br>
+      <span>Score : <strong id="score">0</strong></span><br><br>
+      
+      <span>Time left : <strong id="timer">00</strong>s</span>
     </div>
   
     
@@ -36,7 +41,7 @@
     <div id="question-box" style="display:none;">
       <p class="question">Question…</p>
       <div class="answers"></div>
-      <button id="next-btn">Question suivante</button>
+      <button id="next-btn">Next question</button>
     </div>
   </div>
 </body>

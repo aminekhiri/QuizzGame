@@ -1,0 +1,36 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    /* dégradé violet de fond */
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #fff;
+}
+
+.profile-container {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .profile-container h1 {
+    margin-bottom: 20px;
+  }
+  .profile-item {
+    margin: 10px 0;
+    font-size: 1.1em;
+  }
+  .profile-item span {
+    font-weight: bold;
+  }
+  a.back {
+    display: inline-block;
+    margin-top: 20px;
+    color: #bb86fc;
+    text-decoration: none;
+  }
