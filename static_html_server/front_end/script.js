@@ -5,6 +5,19 @@ document.getElementById("register-btn").addEventListener("click", () => {
   window.location.href = "register.html";
 });
 
+function togglePassword() {
+  const input = document.getElementById("password");
+  const eye = document.querySelector(".toggle-eye");
+
+  if (input.type === "password") {
+    input.type = "text";
+    eye.textContent = "🙈"; // œil fermé
+  } else {
+    input.type = "password";
+    eye.textContent = "👁️"; // œil ouvert
+  }
+}
+
 document.getElementById("login").addEventListener("click", async (e) => {
   e.preventDefault();
 
@@ -39,7 +52,7 @@ document.getElementById("login").addEventListener("click", async (e) => {
     }
 
     // Rediriger vers le quiz
-    window.location.href = "quizz.html";
+    window.location.href = "menu.html";
 
   } catch (err) {
     console.error(err);

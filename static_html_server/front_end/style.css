@@ -76,3 +76,23 @@ button:active {
     background: none;
     text-decoration: underline;
 }
+
+.password-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+    width: 300px;
+}
+
+.password-wrapper input {
+    margin-bottom: 0;
+}
+
+.toggle-eye {
+    margin-left: 10px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center; /* pour bien centrer l’icône elle-même */
+}

@@ -92,6 +92,17 @@ CREATE TABLE IF NOT EXISTS session_answers (
 );
 `);
 
+db.query(`
+CREATE TABLE IF NOT EXISTS best_scores (
+  username       TEXT    NOT NULL REFERENCES users(username),
+  category_id    INTEGER NOT NULL REFERENCES categories(category_id),
+  difficulty_id  INTEGER NOT NULL REFERENCES difficulties(difficulty_id),
+  best_score     INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (username, category_id, difficulty_id)
+);
+`);
+
+
 // ——— Application Oak
 const app = new Application();
 
@@ -135,6 +146,31 @@ async function auth(ctx: Context, next: () => Promise<unknown>) {
 
 // ——— Router
 const router = new Router();
+
+// Route pour finir un quiz et sauvegarder session + best_scores
+router.post("/api/quiz/complete", auth, async (ctx) => {
+  const username = ctx.state.username as string;
+  const { category_id, difficulty_id, total_score } = await ctx.request
+    .body({ type: "json" }).value;
+
+  // 1) Insert dans quiz_sessions
+  db.query(`
+    INSERT INTO quiz_sessions(username, category_id, difficulty_id, total_score)
+    VALUES (?,?,?,?)
+  `, [ username, category_id, difficulty_id, total_score ]);
+
+  // 2) Upsert dans best_scores
+  db.query(`
+    INSERT INTO best_scores(username, category_id, difficulty_id, best_score)
+    VALUES (?,?,?,?)
+    ON CONFLICT(username, category_id, difficulty_id)
+    DO UPDATE SET best_score = excluded.best_score
+      WHERE excluded.best_score > best_scores.best_score;
+  `, [ username, category_id, difficulty_id, total_score ]);
+
+  ctx.response.status = 200;
+  ctx.response.body   = { message: "Session enregistrée" };
+});
 
 /**
  * POST /signup

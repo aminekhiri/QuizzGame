@@ -16,8 +16,11 @@
     <input type="text" placeholder="username" id="identifiant" required></input>
 
     <label for="password">Enter the password</label> 
-    <input type="password" placeholder="psswd" id="password" required></input>
-
+    <div class="password-wrapper">
+        <input type="password" placeholder="psswd" id="password" required>
+        <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+    </div>
+      
     <button type="submit" id="login">Login</button><br><br>
 
     <button id="register-btn" type="button">Register</button>

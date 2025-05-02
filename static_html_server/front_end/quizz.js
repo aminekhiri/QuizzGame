@@ -8,6 +8,8 @@ let currentDifficulty = '';
 let score             = 0;
 let timerInterval     = null;
 let timeLeft          = 0;
+let questionsAsked = 0;
+const MAX_QUESTIONS = 10; 
 
 // Durées par difficulté (secondes)
 const DIFFICULTY_TIME = {
@@ -162,6 +164,40 @@ function startTimer() {
 }
 
 
+async function completeQuiz() {
+  try {
+    // On récupère la catégorie et la difficulté sélectionnées
+    const categoryCode   = currentCategory || 'all';
+    const difficultyCode = currentDifficulty || 'all';
+
+    // Ici on suppose que le serveur saura transformer
+    // categoryCode → category_id, difficultyCode → difficulty_id
+    const res = await fetch("http://localhost:3000/api/quiz/complete", {
+      method:      "POST",
+      headers:     { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        category_code:   categoryCode,
+        difficulty_level: difficultyCode,
+        total_score:     score
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Erreur enregistrement quiz");
+    }
+
+    alert("Votre score a bien été enregistré !");
+    window.location.href = "profile.html";
+
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+}
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   await loadCategories();    // remplit #category-select
   loadDifficulties();        // remplit #difficulty-select
@@ -189,4 +225,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('next-btn')
     .addEventListener('click', showNextQuestion);
+  
+    const finishBtn = document.getElementById('finish-btn');
+
+    // 1) Afficher “Terminer” après N questions ou à la fin du pool
+    document.getElementById('next-btn')
+      .addEventListener('click', () => {
+        questionsAsked++;
+        if (questionsAsked >= MAX_QUESTIONS) {
+          // on masque “suivant” et on affiche “Terminer”
+          document.getElementById('next-btn').style.display = 'none';
+          finishBtn.style.display = 'block';
+        }
+      });
+  
+    // 2) Écoute du bouton Terminer
+    finishBtn.addEventListener('click', completeQuiz);
+
 });
