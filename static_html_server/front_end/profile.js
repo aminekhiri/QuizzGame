@@ -26,47 +26,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('p-username').textContent  = username || 'Anonyme';
   document.getElementById('p-firstname').textContent = first_name || '—';
   document.getElementById('p-lastname').textContent  = last_name  || '—';
-  // Pour le mot de passe, on le lit du localStorage (stocké au login)
-  document.getElementById('p-password').textContent  =
-    localStorage.getItem('password') || '—';
 
-  // 2) Charger la catégorie→codes
-  const categoriesMap = await fetchCategoriesMap();
-
-  // 3) Parcourir les clés bestScore_username_cat_diff
+  // 2) Récupérer les scores depuis le backend
   const ul = document.getElementById('scores-list');
   ul.innerHTML = '';
 
-  Object.keys(localStorage)
-    .filter(key => key.startsWith(`bestScore_${username}_`))
-    .forEach(key => {
-      // key = "bestScore_<username>_<catCode>_<diff>"
-      const parts = key.split('_');
-      // ["bestScore","<username>","<catCode>","<diff>"]
-      const catCode = parts[2];
-      const diff    = parts[3];
-
-      // trouver le label de la catégorie
-      let label = 'Toutes catégories';
-      if (catCode !== 'all') {
-        const entry = Object.entries(categoriesMap)
-          .find(([lbl, codes]) => codes.includes(catCode));
-        if (entry) label = entry[0];
-      }
-
-      // formater la difficulté
-      const diffLabel = diff === 'all'
-        ? 'Toutes difficultés'
-        : diff.charAt(0).toUpperCase() + diff.slice(1);
-
-      const score = localStorage.getItem(key);
-
+    // 2) Récupérer les meilleurs scores depuis le backend
+    try {
+      const res = await fetch('http://localhost:3000/api/best-scores', {
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error("Impossible de récupérer les scores.");
+  
+      const scores = await res.json();  // [{category, difficulty, score}, …]
+      scores.forEach(({ category, difficulty, score }) => {
+        const li = document.createElement('li');
+        li.textContent = `${category} — ${difficulty} : ${score}`;
+        ul.appendChild(li);
+      });
+    } catch (err) {
+      console.error(err);
       const li = document.createElement('li');
-      li.textContent = `${label} — ${diffLabel} : ${score}`;
+      li.textContent = 'Erreur lors du chargement des scores.';
       ul.appendChild(li);
-    });
+    }
+  
 
-  // 4) Si aucun score pour cet utilisateur
+  // 3) Si aucun score pour cet utilisateur
   if (!ul.children.length) {
     const li = document.createElement('li');
     li.textContent = 'Aucun score enregistré pour vous.';

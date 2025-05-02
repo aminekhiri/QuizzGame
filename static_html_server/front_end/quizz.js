@@ -1,7 +1,7 @@
 // quiz.js
 
 const BASE_URL        = 'https://the-trivia-api.com';
-const PRELOAD_LIMIT   = 100;
+let PRELOAD_LIMIT   = 100;
 let questionPool      = [];
 let currentCategory   = '';
 let currentDifficulty = '';
@@ -9,7 +9,8 @@ let score             = 0;
 let timerInterval     = null;
 let timeLeft          = 0;
 let questionsAsked = 0;
-const MAX_QUESTIONS = 10; 
+let MAX_QUESTIONS = 10; 
+let quizCompleted = false; // Indique si le quiz est terminé
 
 // Durées par difficulté (secondes)
 const DIFFICULTY_TIME = {
@@ -30,6 +31,8 @@ function decodeHtml(html) {
   t.innerHTML = html;
   return t.value;
 }
+
+
 
 async function loadCategories() {
   const [catRes, metaRes] = await Promise.all([
@@ -66,6 +69,22 @@ function loadDifficulties() {
   });
 }
 
+//permet de choisir le nombre de questions parmi 3 choix (10, 20 ou 30)
+function questionNumber() {
+  const options = [10, 20, 30];
+  const select  = document.getElementById('question-number-select');
+
+  // Ajout des options
+  options.forEach(n => {
+    select.append(new Option(n.toString(), n));
+  });
+}
+
+document.addEventListener('DOMContentLoaded', questionNumber);
+
+
+
+
 async function loadPool(category='', difficulty='') {
   const url = new URL(`${BASE_URL}/api/questions`);
   url.searchParams.set('limit', PRELOAD_LIMIT);
@@ -79,15 +98,44 @@ async function loadPool(category='', difficulty='') {
   shuffle(questionPool);
 }
 
+function updateCounter() {
+  const ctr = document.getElementById('question-counter');
+  ctr.textContent = `Question ${questionsAsked + 1}/${MAX_QUESTIONS}`;
+}
+
+// **Affiche l’écran final**
+function showFinalScreen() {
+  if (!quizCompleted) {
+    return;
+  }
+  clearInterval(timerInterval);
+  document.getElementById('question-box').style.display   = 'none';
+  document.getElementById('final-screen').style.display  = 'block';
+  document.getElementById('final-score').textContent     = score;
+  document.getElementById('total-questions').textContent = MAX_QUESTIONS;
+}
+
 function showNextQuestion() {
   const qEl  = document.querySelector('.question');
   const aEl  = document.querySelector('.answers');
   const next = document.getElementById('next-btn');
 
+  updateCounter();
+  questionsAsked++;
+
+  if (questionsAsked > MAX_QUESTIONS) {
+    // Si on a atteint le nombre maximum de questions, afficher l'écran final
+    quizCompleted = true; // Indique si le quiz est terminé
+    showFinalScreen();
+    return;
+  }
+
   if (questionPool.length === 0) {
     return loadPool(currentCategory, currentDifficulty)
       .then(showNextQuestion);
   }
+
+
 
   const q = questionPool.pop();
   next.style.display = 'none';
@@ -165,22 +213,23 @@ function startTimer() {
 
 
 async function completeQuiz() {
+  if (!quizCompleted) {
+    return;
+  }
   try {
     // On récupère la catégorie et la difficulté sélectionnées
-    const categoryCode   = currentCategory || 'all';
-    const difficultyCode = currentDifficulty || 'all';
-
+    const payload = {
+      category_code   : currentCategory   || 'all',
+      difficulty_level: currentDifficulty || 'all',
+      total_score     : score
+    };
     // Ici on suppose que le serveur saura transformer
     // categoryCode → category_id, difficultyCode → difficulty_id
     const res = await fetch("http://localhost:3000/api/quiz/complete", {
       method:      "POST",
       headers:     { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({
-        category_code:   categoryCode,
-        difficulty_level: difficultyCode,
-        total_score:     score
-      })
+      body: JSON.stringify(payload)
     });
 
     if (!res.ok) {
@@ -195,6 +244,9 @@ async function completeQuiz() {
     console.error(err);
     alert(err.message);
   }
+
+  // Afficher l'écran final
+  showFinalScreen();
 }
 
 
@@ -208,13 +260,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   const qbox    = document.getElementById('question-box');
   const start   = document.getElementById('start-btn');
 
+
   start.addEventListener('click', async () => {
+
+    const qCount = parseInt(document.getElementById('question-number-select').value,10) || MAX_QUESTIONS;
+
+    MAX_QUESTIONS   = qCount;
+    PRELOAD_LIMIT   = qCount;
+
     currentCategory   = selCat.value;
     currentDifficulty = selDiff.value;
     cfg.style.display  = 'none';
     qbox.style.display = 'block';
+
+    document.getElementById('quit-btn').style.display = 'block';
+
+  
+  
     try {
       await loadPool(currentCategory, currentDifficulty);
+      
       showNextQuestion();
     } catch (e) {
       console.error(e);
@@ -223,23 +288,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // Gestionnaire pour le bouton "Quit"
+  document.getElementById('quit-btn')
+    .addEventListener('click', () => {
+    // Réinitialiser l'état du quiz
+    questionsAsked = 0;
+    score = 0;
+    questionPool = [];
+    quizCompleted = false; // Réinitialiser l'état du quiz
+
+    // Masquer le quiz et afficher l'écran de configuration
+    qbox.style.display = 'none';
+    cfg.style.display  = 'block';
+
+    // Masquer le bouton "Quit"
+    document.getElementById('quit-btn').style.display = 'none';
+  });
+
   document.getElementById('next-btn')
     .addEventListener('click', showNextQuestion);
-  
-    const finishBtn = document.getElementById('finish-btn');
 
     // 1) Afficher “Terminer” après N questions ou à la fin du pool
     document.getElementById('next-btn')
       .addEventListener('click', () => {
-        questionsAsked++;
-        if (questionsAsked >= MAX_QUESTIONS) {
-          // on masque “suivant” et on affiche “Terminer”
+        
+        if (questionsAsked > MAX_QUESTIONS) {
+          
           document.getElementById('next-btn').style.display = 'none';
-          finishBtn.style.display = 'block';
         }
       });
-  
-    // 2) Écoute du bouton Terminer
-    finishBtn.addEventListener('click', completeQuiz);
 
 });
+
+//le bouton quit s'affiche quand 

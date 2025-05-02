@@ -147,6 +147,7 @@ async function auth(ctx: Context, next: () => Promise<unknown>) {
 // ——— Router
 const router = new Router();
 
+
 // Route pour finir un quiz et sauvegarder session + best_scores
 router.post("/api/quiz/complete", auth, async (ctx) => {
   const username = ctx.state.username as string;
@@ -259,6 +260,32 @@ router.get("/api/me", auth, (ctx) => {
     ctx.response.body   = { message: "Utilisateur non trouvé" };
   }
 });
+
+/**
+ * GET /api/best-scores
+ * Renvoie tous les meilleurs scores de l'utilisateur connecté
+ */
+router.get("/api/best-scores", auth, (ctx) => {
+  const username = ctx.state.username as string;
+  // On joint best_scores → categories → difficulties pour remonter labels
+  const rows = [...db.query(`
+    SELECT c.name, d.level, b.best_score
+    FROM best_scores b
+    JOIN categories c   ON b.category_id   = c.category_id
+    JOIN difficulties d ON b.difficulty_id = d.difficulty_id
+    WHERE b.username = ?
+  `, [username])];
+
+  // Transforme en JSON
+  const result = rows.map(([category, difficulty, best_score]) => ({
+    category,
+    difficulty,
+    score: best_score
+  }));
+
+  ctx.response.body = result;
+});
+
 
 /**
  * GET /quiz
