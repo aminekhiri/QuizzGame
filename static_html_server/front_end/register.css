@@ -6,7 +6,8 @@ margin: 0;
 padding: 0;
 height: 100vh;
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-background: linear-gradient(135deg, #6a11cb, #2575fc);
+background: url('background-1.png') center center no-repeat;
+background-size: cover;
 display: flex;
 justify-content: center;
 align-items: center;
@@ -17,7 +18,7 @@ align-items: center;
 display: flex;
 flex-direction: column;
 align-items: stretch;
-background: rgba(33, 24, 73, 0.85);
+background: rgba(33, 24, 73, 1);
 padding: 2rem;
 border-radius: 12px;
 box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -42,7 +43,7 @@ font-size: 0.95em;
 
 /* Champs de saisie (empilés) */
 .form-container input {
-width: 100%;
+width: 93%;
 padding: 0.6rem 0.8rem;
 margin-bottom: 1rem;
 border: none;
@@ -99,3 +100,20 @@ transition: color 0.2s ease;
 .form-container p a:hover {
 color: #d1b3ff;
 }
+
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 0px;
+    top: 35%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 28px;
+    height: 24px;
+    z-index: 2;
+}
+

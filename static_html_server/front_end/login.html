@@ -10,22 +10,28 @@
 
 <body>
 
-    <h1>Log in</h1>
 
-    <label for="identifiant">Enter the id</label> 
-    <input type="text" placeholder="username" id="identifiant" required></input>
 
-    <label for="password">Enter the password</label> 
-    <div class="password-wrapper">
-        <input type="password" placeholder="psswd" id="password" required>
-        <span class="toggle-eye" onclick="togglePassword()">👁️</span>
+    <div class="form-container">
+        <h1>Log in</h1> 
+
+        <label for="identifiant">Enter the id</label> 
+        <input type="text" placeholder="username" id="identifiant" required></input>
+
+        <label for="password">Enter the password</label> 
+        <div class="password-wrapper">
+            <input type="password" placeholder="psswd" id="password" required>
+            <img class="toggle-eye" onclick="togglePassword()" src="eye-open.png" alt="Afficher le mot de passe" draggable="false">
+        </div><br><br>
+        
+        <button type="submit" id="login">Login</button><br>
+
+        <button id="register-btn" type="button">Register</button>
+
+        <button type="submit" id="forgot">Forgot password ?</button><br><br>
+
+        <script src="script.js"></script>
     </div>
-      
-    <button type="submit" id="login">Login</button><br><br>
 
-    <button id="register-btn" type="button">Register</button>
 
-    <button type="submit" id="forgot">Forgot password ?</button><br><br>
-
-    <script src="script.js"></script>
 </body>

@@ -2,7 +2,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('login_image.png') center center no-repeat;
+    background: url('background-1.png') center center no-repeat;
     background-size: cover;
     color: #fff;
     display: flex;
@@ -24,16 +24,16 @@ label {
     margin-bottom: 5px;
 }
 
-input {
-    padding: 10px 15px;
+.form-container input {
+    width: 93%;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
     border: none;
-    border-radius: 8px;
-    width: 250px;
-    margin-bottom: 15px;
+    border-radius: 6px;
     font-size: 1em;
     background-color: #f5f0ff;
     color: #333;
-    transition: all 0.3s ease;
+    transition: box-shadow 0.3s ease;
 }
 
 input:focus {
@@ -78,11 +78,8 @@ button:active {
 }
 
 .password-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-    width: 300px;
+    position: relative;
+    display: inline-block;
 }
 
 .password-wrapper input {
@@ -90,9 +87,34 @@ button:active {
 }
 
 .toggle-eye {
-    margin-left: 10px;
-    font-size: 1.2rem;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
     cursor: pointer;
-    display: flex;
-    align-items: center; /* pour bien centrer l’icône elle-même */
+    width: 28px;
+    height: 24px;
+    z-index: 2;
 }
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background: rgba(33, 24, 73, 1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 320px;
+    color: #f0e9ff;
+    
+}
+
+/* Titre */
+.form-container h1 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.8em;
+    color: #fff;
+    }
+    

@@ -10,11 +10,11 @@ function togglePassword() {
   const eye = document.querySelector(".toggle-eye");
 
   if (input.type === "password") {
-    input.type = "text";
-    eye.textContent = "🙈"; // œil fermé
+      input.type = "text";
+      eye.src = "eye-closed.png";
   } else {
-    input.type = "password";
-    eye.textContent = "👁️"; // œil ouvert
+      input.type = "password";
+      eye.src = "eye-open.png";
   }
 }
 
@@ -59,3 +59,4 @@ document.getElementById("login").addEventListener("click", async (e) => {
     alert(err.message);
   }
 });
+

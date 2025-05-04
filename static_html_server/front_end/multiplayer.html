@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Multiplayer Mode</title>
+  <link rel="stylesheet" href="multiplayer.css">
+  <script src="multiplayer.js" defer></script>
+</head>
+<body>
+  <div class="mp-container">
+    <h1>Multiplayer Quiz</h1>
+    <div id="status" class="status">server connection…</div>
+    <div id="match-info" class="match hidden">
+      Match found ! You play against <span id="opponent-name"></span>.
+    </div>
+    <div id="question-box" class="question-box hidden">
+      <p id="question-text" class="question"></p>
+      <div id="answers" class="answers"></div>
+      <div class="timer-score">
+        <div>Time : <span id="timer">0</span>s</div>
+        <div>You : <span id="score-you">0</span></div>
+        <div>Opponent : <span id="score-them">0</span></div>
+      </div>
+      <button id="next-btn" class="next-btn hidden">Next Question</button>
+    </div>
+    <div id="result-screen" class="result hidden">
+      <h2 id="result-text"></h2>
+      <button id="play-again" class="btn">Replay</button>
+      <button id="back-menu" class="btn">Menu</button>
+    </div>
+  </div>
+</body>
+</html>

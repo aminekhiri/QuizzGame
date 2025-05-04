@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
     document.getElementById('multi-btn')
       .addEventListener('click', () => {
-        alert("Mode multijoueur pas encore implémenté.");
+        window.location.href = 'multiplayer.html';
       });
   });
   

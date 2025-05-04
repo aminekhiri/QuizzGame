@@ -1,15 +1,16 @@
 // back_server.ts
 
 // ❶ Charger les variables d’environnement depuis .env
-import { load } from "https://deno.land/std@0.203.0/dotenv/mod.ts";
+import { load} from "https://deno.land/std@0.203.0/dotenv/mod.ts";
 await load({ export: true });
 
 // ❷ Imports Oak, CORS, JWT, bcrypt, SQLite
-import { Application, Router, Context, send } from "https://deno.land/x/oak@v12.6.1/mod.ts";
+import { Application, Router, Context, send} from "https://deno.land/x/oak@v12.6.1/mod.ts";
 import { oakCors }                       from "https://deno.land/x/cors@v1.2.2/mod.ts";
 import { hash, compare }                 from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { create, verify, getNumericDate }from "https://deno.land/x/djwt@v2.8/mod.ts";
 import { DB }                            from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
+
 
 
 // ——— Paramètres
@@ -93,14 +94,16 @@ CREATE TABLE IF NOT EXISTS session_answers (
 `);
 
 db.query(`
-CREATE TABLE IF NOT EXISTS best_scores (
-  username       TEXT    NOT NULL REFERENCES users(username),
-  category_id    INTEGER NOT NULL REFERENCES categories(category_id),
-  difficulty_id  INTEGER NOT NULL REFERENCES difficulties(difficulty_id),
-  best_score     INTEGER NOT NULL DEFAULT 0,
-  PRIMARY KEY (username, category_id, difficulty_id)
-);
+  CREATE TABLE IF NOT EXISTS best_scores (
+    username        TEXT    NOT NULL REFERENCES users(username),
+    category_id     INTEGER NOT NULL REFERENCES categories(category_id),
+    difficulty_id   INTEGER NOT NULL REFERENCES difficulties(difficulty_id),
+    question_count  INTEGER NOT NULL DEFAULT 10,
+    best_score      INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (username, category_id, difficulty_id, question_count)
+  );
 `);
+  
 
 
 // ——— Application Oak
@@ -108,23 +111,40 @@ const app = new Application();
 
 // ——— CORS global
 app.use(oakCors({
-  origin:      Deno.env.get("CORS_ORIGIN")  || "http://localhost:8080",
-  credentials: true
+  origin: (requestOrigin) => {
+    // autorise http://localhost:8080 ET https://localhost:8080
+    if (
+      requestOrigin === "http://localhost:8080" ||
+      requestOrigin === "https://localhost:8080"
+    ) {
+      return requestOrigin;
+    }
+    return ""; // sinon origin refusée
+  },
+  credentials: true,
 }));
+
 
 // ——— Pré-vol OPTIONS
 app.use(async (ctx, next) => {
   if (ctx.request.method === "OPTIONS") {
-    const origin = ctx.request.headers.get("Origin") ?? "";
+    const origin = ctx.request.headers.get("Origin")!;
     ctx.response.headers.set("Access-Control-Allow-Origin", origin);
     ctx.response.headers.set("Access-Control-Allow-Credentials", "true");
-    ctx.response.headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    ctx.response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS",
+    );
+    ctx.response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization",
+    );
     ctx.response.status = 204;
-  } else {
-    await next();
+    return;
   }
+  await next();
 });
+
 
 // ——— Middleware d’authentification
 async function auth(ctx: Context, next: () => Promise<unknown>) {
@@ -151,27 +171,34 @@ const router = new Router();
 // Route pour finir un quiz et sauvegarder session + best_scores
 router.post("/api/quiz/complete", auth, async (ctx) => {
   const username = ctx.state.username as string;
-  const { category_id, difficulty_id, total_score } = await ctx.request
-    .body({ type: "json" }).value;
+  const {
+    category_id,
+    difficulty_id,
+    total_score,
+    question_count   // ← récupéré depuis le front
+  } = await ctx.request.body({ type: "json" }).value;
 
-  // 1) Insert dans quiz_sessions
+  // 1) Enregistrement de la session
   db.query(`
-    INSERT INTO quiz_sessions(username, category_id, difficulty_id, total_score)
+    INSERT INTO quiz_sessions
+      (username, category_id, difficulty_id, total_score)
     VALUES (?,?,?,?)
-  `, [ username, category_id, difficulty_id, total_score ]);
+  `, [username, category_id, difficulty_id, total_score]);
 
-  // 2) Upsert dans best_scores
+  // 2) Upsert best_scores en incluant question_count
   db.query(`
-    INSERT INTO best_scores(username, category_id, difficulty_id, best_score)
-    VALUES (?,?,?,?)
-    ON CONFLICT(username, category_id, difficulty_id)
+    INSERT INTO best_scores
+      (username, category_id, difficulty_id, question_count, best_score)
+    VALUES (?,?,?,?,?)
+    ON CONFLICT(username, category_id, difficulty_id, question_count)
     DO UPDATE SET best_score = excluded.best_score
-      WHERE excluded.best_score > best_scores.best_score;
-  `, [ username, category_id, difficulty_id, total_score ]);
+      WHERE excluded.best_score > best_scores.best_score
+  `, [username, category_id, difficulty_id, question_count, total_score]);
 
   ctx.response.status = 200;
   ctx.response.body   = { message: "Session enregistrée" };
 });
+
 
 /**
  * POST /signup
@@ -243,6 +270,16 @@ router.post("/login", async (ctx) => {
   }
 });
 
+
+/**
+ * GET /logout
+*/
+router.get("/logout", (ctx) => {
+  ctx.cookies.delete("jwt", { path: "/" });   // supprime le cookie
+  ctx.response.status = 204;                  // No Content
+});
+
+
 /**
  * GET /api/me
  */
@@ -300,9 +337,200 @@ router.get("/quiz", auth, async (ctx) => {
   });
 });
 
+/** Mélange un tableau en place (Fisher–Yates) */
+function shuffle<T>(arr: T[]): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+
+/**
+ * Récupère 10 questions multiple choice depuis The Trivia API,
+ * les mélange et retourne un tableau d’objets { text, choices, correct }.
+ */
+async function pick10Questions() {
+  // 1) Récupérer 10 questions
+  const res = await fetch("https://the-trivia-api.com/api/questions?limit=10&type=multipleChoice");
+  if (!res.ok) throw new Error(`Trivia API status ${res.status}`);
+  const data = await res.json();
+
+  // 2) Formater chaque question
+  return data.map((q: any) => {
+    // texte brut (string ou { text })
+    const text = typeof q.question === 'object' ? q.question.text : q.question;
+
+    const correct = q.correctAnswer;
+    const wrongs  = q.incorrectAnswers;
+    const choices = shuffle([correct, ...wrongs]);
+
+    return { text, choices, correct };
+  });
+}
+
+async function startMatch(
+  p1: { ws: WebSocket; username: string },
+  p2: { ws: WebSocket; username: string },
+) {
+  const questions = await pick10Questions();
+  let idx = 0;
+
+  const scores: Record<string, number> = {
+    [p1.username]: 0,
+    [p2.username]: 0,
+  };
+
+  // Indique si chaque joueur a déjà répondu à la question en cours
+  let responded: Record<string, boolean> = {
+    [p1.username]: false,
+    [p2.username]: false,
+  };
+
+  // 1) Envoi du match found
+  p1.ws.send(JSON.stringify({ type: "matched", opponent: p2.username }));
+  p2.ws.send(JSON.stringify({ type: "matched", opponent: p1.username }));
+
+  // 2) Gestion des messages (réponses) pour chaque joueur
+  const handleAnswer = (player: { ws: WebSocket; username: string }) => {
+    player.ws.onmessage = ev => {
+      const msg = JSON.parse(ev.data);
+      if (msg.type !== "answer" || responded[player.username]) return;
+      // On ne compte qu’une seule réponse par question
+      responded[player.username] = true;
+      // Si la réponse est correcte, on incrémente le score de CE joueur
+      if (msg.answer === questions[idx].correct) {
+        scores[player.username]++;
+      }
+    };
+  };
+
+  handleAnswer(p1);
+  handleAnswer(p2);
+
+  function resetResponded() {
+    responded[p1.username] = false;
+    responded[p2.username] = false;
+  }
+  
+
+  // 3) Fonction récursive qui pose la question n°idx
+  const poseQuestion = () => {
+    if (idx >= questions.length) {
+      // 4) Fin du match : on calcule l’issue pour chacun
+      const s1 = scores[p1.username], s2 = scores[p2.username];
+      const out1 = s1 > s2 ? "win" : s1 < s2 ? "lose" : "draw";
+      const out2 = s2 > s1 ? "win" : s2 < s1 ? "lose" : "draw";
+
+      p1.ws.send(JSON.stringify({ type: "end", outcome: out1 }));
+      p2.ws.send(JSON.stringify({ type: "end", outcome: out2 }));
+      return;
+    }
+
+    // Réinitialise la traçabilité des réponses
+    responded[p1.username] = false;
+    responded[p2.username] = false;
+
+    // 5) Envoi de la question synchronisée
+    const q = questions[idx];
+    [p1.ws, p2.ws].forEach(ws =>
+      ws.send(JSON.stringify({
+        type:     "question",
+        question: q.text,
+        choices:  q.choices,
+        time:     q.time ?? 15
+      }))
+    );
+
+    // 6) Après la durée du timer, on diffuse les scores individuellement
+    setTimeout(() => {
+      [p1, p2].forEach(player => {
+        const other = player === p1 ? p2 : p1;     // ← récupère l’adversaire
+        player.ws.send(JSON.stringify({
+          type:    "scores",
+          you:     scores[player.username],
+          them:    scores[other.username],
+          correct: questions[idx].correct
+        }));
+      });
+      
+
+      // 7) On attend encore 5 s pour que le client affiche vert/rouge
+      setTimeout(() => {
+        idx++;
+        poseQuestion();
+      }, 5000);
+
+    }, (q.time ?? 15) * 1000);
+  };
+
+  resetResponded(); 
+
+  // 8) Lancement de la première question
+  poseQuestion();
+}
+
+
+// file d’attente globale
+const waiting: { ws: WebSocket; username: string }[] = [];
+
+router.get("/multiplayer", async (ctx) => {
+  if (!ctx.isUpgradable) return ctx.throw(400);
+  const ws = await ctx.upgrade();
+
+  ws.onmessage = async (ev) => {
+    const msg = JSON.parse(ev.data);
+    if (msg.type === "join") {
+      const username = msg.username as string;
+
+      // 1) Si ce socket est déjà en attente, on ignore
+      if (waiting.some(p => p.ws === ws)) return;
+
+      // 2) Cherche un partenaire différent
+      const partnerIndex = waiting.findIndex(p => p.ws !== ws);
+      if (partnerIndex !== -1) {
+        // on a trouvé un autre joueur en attente
+        const partner = waiting.splice(partnerIndex, 1)[0];
+        // pas besoin de garder le joueur courant en file
+        await startMatch({ ws, username }, partner);
+      } else {
+        // pas de partenaire dispo, on s’ajoute à la file
+        waiting.push({ ws, username });
+      }
+    }
+  };
+
+  ws.onclose = () => {
+    // si on se déconnecte sans matcher, on retire de la file
+    const idx = waiting.findIndex(p => p.ws === ws);
+    if (idx !== -1) waiting.splice(idx, 1);
+  };
+});
+
+
 // ——— Monter le router et démarrer
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-console.log("🚀 Back-end sur le port 3000");
+/** 
+
+const options = {
+  port: 3000,
+  cert: await Deno.readTextFile("./localhost.crt"),
+  key: await Deno.readTextFile("./localhost.key"),
+};
+
+// Démarrage avec le listener personnalisé
+console.log(`🚀 Serveur HTTPS sur https://localhost:${options.port}`);
+
+await app.listen({
+  port:   options.port,
+  secure: true,
+  cert:   options.cert,
+  key:    options.key,
+});
+
+*/
+console.log("🚀 Back-end HTTP sur http://localhost:3000");
 await app.listen({ port: 3000 });

@@ -10,11 +10,13 @@
 
 </head>
 <body>
-  <button id="logout-btn" class="logout-btn">Logout</button>
+  
   
   <div class="quiz-container">
     <h1>General Knowledge Quiz</h1>
-    <a href="profile.html" class="profile-link" title="My profile">My profile 👤</a>
+    <a href="profile.html" class="profile-link" title="Mon profil">
+      <img src="profile-icon.png" alt="Profil" class="profile-icon">My Profile</a>
+    <button href="login.html" id="logout-btn" class="logout-btn" title="Logout">Logout</button>
 
     <div id="config">
       <label for="category-select">Choose a theme :</label>
@@ -41,7 +43,7 @@
       <br>
       <span>Score : <strong id="score">0</strong></span><br><br>
       
-      <span>Time left : <strong id="timer">00</strong>s</span><br><br>
+      <span>Time left : <strong id="timer">00</strong></span><br><br>
 
       
     </div>
@@ -53,12 +55,14 @@
       <div class="answers"></div>
       <button id="next-btn">Question suivante</button><br><br>
       <button id="quit-btn" style="display: none">Quit</button>
+      
     </div>
 
     <!-- écran de fin -->
     <div id="final-screen" style="display:none; text-align:center;">
-      <h2>Quiz terminé !</h2>
-      <p>Votre score : <span id="final-score"></span> / <span id="total-questions"></span></p>
+      <h2>Quiz completed !</h2>
+      <p>Your score : <span id="final-score"></span> / <span id="total-questions"></span></p>
+      <button id="new-quiz-btn" style="display: none">New Quiz</button><br><br>
     </div>
 
       
@@ -69,7 +73,6 @@
       <p class="question">Question…</p>
       <div class="answers"></div>
       <button id="next-btn">Next question</button><br>
-      <button id="finish-btn" style="display:none;">Terminer le quiz</button>
 
     </div>
   </div>

@@ -111,9 +111,12 @@ function showFinalScreen() {
   clearInterval(timerInterval);
   document.getElementById('question-box').style.display   = 'none';
   document.getElementById('final-screen').style.display  = 'block';
+  document.getElementById('new-quiz-btn').style.display = 'block';
   document.getElementById('final-score').textContent     = score;
   document.getElementById('total-questions').textContent = MAX_QUESTIONS;
+
 }
+
 
 function showNextQuestion() {
   const qEl  = document.querySelector('.question');
@@ -221,11 +224,12 @@ async function completeQuiz() {
     const payload = {
       category_code   : currentCategory   || 'all',
       difficulty_level: currentDifficulty || 'all',
+      question_count:   MAX_QUESTIONS,
       total_score     : score
     };
     // Ici on suppose que le serveur saura transformer
     // categoryCode → category_id, difficultyCode → difficulty_id
-    const res = await fetch("http://localhost:3000/api/quiz/complete", {
+    const res = await fetch("https://localhost:3000/api/quiz/complete", {
       method:      "POST",
       headers:     { "Content-Type": "application/json" },
       credentials: "include",
@@ -247,6 +251,8 @@ async function completeQuiz() {
 
   // Afficher l'écran final
   showFinalScreen();
+
+
 }
 
 
@@ -275,8 +281,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('quit-btn').style.display = 'block';
 
-  
-  
     try {
       await loadPool(currentCategory, currentDifficulty);
       
@@ -290,25 +294,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Gestionnaire pour le bouton "Quit"
   document.getElementById('quit-btn')
-    .addEventListener('click', () => {
-    // Réinitialiser l'état du quiz
-    questionsAsked = 0;
-    score = 0;
-    questionPool = [];
-    quizCompleted = false; // Réinitialiser l'état du quiz
+  .addEventListener('click', () => {
+    resetQuizState();
+});
 
-    // Masquer le quiz et afficher l'écran de configuration
-    qbox.style.display = 'none';
-    cfg.style.display  = 'block';
-
-    // Masquer le bouton "Quit"
-    document.getElementById('quit-btn').style.display = 'none';
-  });
 
   document.getElementById('next-btn')
     .addEventListener('click', showNextQuestion);
 
-    // 1) Afficher “Terminer” après N questions ou à la fin du pool
+    
     document.getElementById('next-btn')
       .addEventListener('click', () => {
         
@@ -321,3 +315,55 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 //le bouton quit s'affiche quand 
+async function doLogout() {
+  try {
+    await fetch("https://localhost:3000/logout", { credentials: "include" });
+  } catch { /* ignore, on veut juste effacer quand même */ }
+
+  // on vide les données locales
+  localStorage.removeItem("username");
+  localStorage.removeItem("password");
+  // si tu stockes bestScore_…, tu peux garder ou tout vider :
+  // Object.keys(localStorage).forEach(k => k.startsWith('bestScore_') && localStorage.removeItem(k));
+
+  // redirection vers la page de connexion
+  window.location.href = "login.html";
+}
+
+document.getElementById('logout-btn').addEventListener('click', (e) => {
+  doLogout();
+});
+
+document.getElementById('new-quiz-btn')
+  .addEventListener('click', () => {
+    resetQuizState();
+});
+
+
+function resetQuizState() {
+  //Arrêter le timer
+  clearInterval(timerInterval);
+  timerInterval = null;
+  timeLeft = 0;
+
+  // Réinitialiser les variables de l'état du quiz
+  questionsAsked = 0;
+  score          = 0;
+  quizCompleted  = false;
+
+  // Vider le pool de questions
+  questionPool = [];
+
+  // réinitialiser les éléments de l'interface
+  document.getElementById('score').textContent           = '0';
+  document.getElementById('timer').textContent           = '';
+  document.getElementById('question-counter').textContent = '';
+  document.querySelector('.answers').innerHTML           = '';
+  
+  //Masquer les zones quiz/final et afficher config
+  document.getElementById('question-box').style.display   = 'none';
+  document.getElementById('final-screen').style.display  = 'none';
+  document.getElementById('quit-btn').style.display      = 'none';
+  document.getElementById('new-quiz-btn').style.display  = 'none';
+  document.getElementById('config').style.display        = 'block';
+}

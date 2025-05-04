@@ -1,5 +1,18 @@
 // signup.js
 
+function togglePassword() {
+  const input = document.getElementById("password");
+  const eye = document.querySelector(".toggle-eye");
+
+  if (input.type === "password") {
+      input.type = "text";
+      eye.src = "eye-closed.png";
+  } else {
+      input.type = "password";
+      eye.src = "eye-open.png";
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('signup-btn');
   
@@ -15,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
   
       try {
-        const res = await fetch("http://localhost:3000/signup", {
+        const res = await fetch("https://localhost:3000/signup", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',

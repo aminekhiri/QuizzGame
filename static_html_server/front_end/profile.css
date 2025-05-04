@@ -4,7 +4,8 @@ html, body {
     padding: 0;
     height: 100%;
     /* dégradé violet de fond */
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    background: url(background-solo.png) center center no-repeat;
+    background-size: cover;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #fff;
 }
@@ -13,7 +14,7 @@ html, body {
     max-width: 400px;
     margin: 60px auto;
     padding: 20px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(33,24,73,1);
     border-radius: 8px;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;

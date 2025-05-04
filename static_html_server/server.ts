@@ -3,6 +3,7 @@
 import { Application, send } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
 const app = new Application();
+const USE_HTTPS = Deno.args.includes("--https");
 const ROOT = `${Deno.cwd()}/front_end`;
 
 // Middleware principal : envoie le fichier demandé ou index.html
@@ -19,23 +20,19 @@ app.use(async (ctx) => {
   }
 });
 
-// Lecture du port (et, optionnellement, du certificat et de la clé pour HTTPS)
-if (Deno.args.length < 1) {
-  console.log(
-    `Usage: deno run --allow-net --allow-read=./ server.ts PORT [CERT_PATH KEY_PATH]`,
-  );
-  Deno.exit();
+const port = Deno.args[0] ? Number(Deno.args[0]) : 8080;
+
+const options = {
+  cert : await Deno.readTextFile("../localhost.crt"),
+  key : await Deno.readTextFile("../localhost.key"),
+  
 }
-
-const port = Number(Deno.args[0]);
-const options: any = { port };
-
-if (Deno.args.length >= 3) {
-  options.secure = true;
-  options.cert = await Deno.readTextFile(Deno.args[1]);
-  options.key = await Deno.readTextFile(Deno.args[2]);
-  console.log(`🔒 SSL enabled (HTTPS)`);
-}
-
+console.log(`🔒 SSL enabled (HTTPS)`);
 console.log(`📂 Static server running on port ${port}, serving ${ROOT}`);
-await app.listen(options);
+
+await app.listen({
+  port:   port,
+  secure: true,
+  cert:   options.cert,
+  key:    options.key,
+});
