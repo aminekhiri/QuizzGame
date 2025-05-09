@@ -31,15 +31,18 @@ const db = new DB(DB_FILE);
 
 // Création des tables
 db.query(`
-CREATE TABLE IF NOT EXISTS users (
-  username      TEXT    PRIMARY KEY,
-  first_name    TEXT    NOT NULL,
-  last_name     TEXT    NOT NULL,
-  password_hash TEXT    NOT NULL,
-  created_at    DATETIME DEFAULT (datetime('now')),
-  last_login    DATETIME
-);
-`);
+  CREATE TABLE IF NOT EXISTS users (
+    username      TEXT    PRIMARY KEY,
+    first_name    TEXT    NOT NULL,
+    last_name     TEXT    NOT NULL,
+    password_hash TEXT    NOT NULL,
+    is_admin      BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at    DATETIME DEFAULT (datetime('now')),
+    last_login    DATETIME
+  );
+  `);
+  
+
 db.query(`
 CREATE TABLE IF NOT EXISTS categories (
   category_id   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,6 +106,25 @@ db.query(`
     PRIMARY KEY (username, category_id, difficulty_id, question_count)
   );
 `);
+
+
+// compte administrateur
+db.query(`
+  INSERT OR IGNORE INTO users(
+    username,
+    first_name,
+    last_name,
+    password_hash,
+    is_admin
+  ) VALUES (?, ?, ?, ?, ?)
+`, [
+  'admin',
+  'Super',
+  'Admin',
+  await hash("admin"),
+  1              // 1 pour true
+]);
+
   
 
 
@@ -127,21 +149,18 @@ app.use(oakCors({
 
 // ——— Pré-vol OPTIONS
 app.use(async (ctx, next) => {
+  const origin = ctx.request.headers.get("Origin") ?? "";
+  ctx.response.headers.set("Access-Control-Allow-Origin", origin);
+  ctx.response.headers.set("Access-Control-Allow-Credentials", "true");
+  ctx.response.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+
   if (ctx.request.method === "OPTIONS") {
-    const origin = ctx.request.headers.get("Origin")!;
-    ctx.response.headers.set("Access-Control-Allow-Origin", origin);
-    ctx.response.headers.set("Access-Control-Allow-Credentials", "true");
-    ctx.response.headers.set(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS",
-    );
-    ctx.response.headers.set(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization",
-    );
+    // on répond directement, sans next()
     ctx.response.status = 204;
     return;
   }
+  // pour POST/GET/etc. on passe au middleware suivant une seule fois
   await next();
 });
 
@@ -164,8 +183,53 @@ async function auth(ctx: Context, next: () => Promise<unknown>) {
   }
 }
 
+
+async function adminOnly(ctx: Context, next: () => Promise<unknown>) {
+  const rows = [...db.query(
+    `SELECT is_admin FROM users WHERE username = ?`,
+    [ctx.state.username]
+  )];
+  if (!rows.length || rows[0][0] !== 1) {
+    ctx.response.status = 403;
+    ctx.response.body   = { message: "Accès admin uniquement" };
+    return;
+  }
+  await next();
+}
+
+
 // ——— Router
 const router = new Router();
+
+//route pour récupérer les utilisateurs pour le compte admin
+router.get(
+  "/api/admin/users",
+   auth,
+   adminOnly,
+  (ctx) => {
+    const rows = [...db.query(`
+      SELECT
+        username,
+        first_name,
+        last_name,
+        is_admin,
+        created_at,
+        last_login
+      FROM users
+    `)];
+    // Transformer les tuples en objets
+    const users = rows.map(([username, first_name, last_name, is_admin, created_at, last_login]) => ({
+      username,
+      first_name,
+      last_name,
+      is_admin: is_admin === true,
+      created_at,
+      last_login
+    }));
+    ctx.response.body = { users };
+  }
+);
+
 
 
 // Route pour finir un quiz et sauvegarder session + best_scores
@@ -285,18 +349,27 @@ router.get("/logout", (ctx) => {
  */
 router.get("/api/me", auth, (ctx) => {
   const username = ctx.state.username as string;
+  // On récupère first_name, last_name ET is_admin en une seule requête
   const rows = [...db.query(
-    `SELECT first_name, last_name FROM users WHERE username = ?`,
+    `SELECT first_name, last_name, is_admin FROM users WHERE username = ?`,
     [username]
   )];
+
   if (rows.length) {
-    const [first_name, last_name] = rows[0] as [string, string];
-    ctx.response.body = { username, first_name, last_name };
+    const [first_name, last_name, is_admin] = rows[0] as [string, string, number];
+    ctx.response.body = {
+      username,
+      first_name,
+      last_name,
+      // transforme 0|1 en false|true
+      is_admin: is_admin === 1
+    };
   } else {
     ctx.response.status = 404;
     ctx.response.body   = { message: "Utilisateur non trouvé" };
   }
 });
+
 
 /**
  * GET /api/best-scores
@@ -355,7 +428,7 @@ async function pick10Questions() {
   // 1) Récupérer 10 questions
   const res = await fetch("https://the-trivia-api.com/api/questions?limit=10&type=multipleChoice");
   if (!res.ok) throw new Error(`Trivia API status ${res.status}`);
-  const data = await res.json();
+  const data = await res.json(); //récupère les données
 
   // 2) Formater chaque question
   return data.map((q: any) => {
@@ -513,12 +586,12 @@ router.get("/multiplayer", async (ctx) => {
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-/** 
+
 
 const options = {
   port: 3000,
-  cert: await Deno.readTextFile("./localhost.crt"),
-  key: await Deno.readTextFile("./localhost.key"),
+  cert: await Deno.readTextFile("./cert.pem"),
+  key: await Deno.readTextFile("./key.pem"),
 };
 
 // Démarrage avec le listener personnalisé
@@ -531,6 +604,5 @@ await app.listen({
   key:    options.key,
 });
 
-*/
-console.log("🚀 Back-end HTTP sur http://localhost:3000");
-await app.listen({ port: 3000 });
+// console.log("🚀 Back-end HTTP sur http://localhost:3000");
+// await app.listen({ port: 3000 });

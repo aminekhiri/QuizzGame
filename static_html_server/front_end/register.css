@@ -117,3 +117,20 @@ color: #d1b3ff;
     z-index: 2;
 }
 
+.menu-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 24px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #7e57c2;
+    color: #fff;
+    transition: background-color 0.2s;
+}
+

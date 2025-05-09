@@ -367,3 +367,16 @@ function resetQuizState() {
   document.getElementById('new-quiz-btn').style.display  = 'none';
   document.getElementById('config').style.display        = 'block';
 }
+
+
+// Gestionnaire pour le bouton "menu"
+document.getElementById('menu-btn')
+  .addEventListener('click', () => {
+    window.location.href = 'menu.html';
+  });
+
+// Gestionnaire pour le bouton "profile"
+document.getElementById('profile-btn')
+  .addEventListener('click', () => {
+    window.location.href = 'profile.html';
+  });

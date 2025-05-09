@@ -23,12 +23,12 @@ app.use(async (ctx) => {
 const port = Deno.args[0] ? Number(Deno.args[0]) : 8080;
 
 const options = {
-  cert : await Deno.readTextFile("../localhost.crt"),
-  key : await Deno.readTextFile("../localhost.key"),
+  cert : await Deno.readTextFile("../cert.pem"),
+  key : await Deno.readTextFile("../key.pem"),
   
 }
 console.log(`🔒 SSL enabled (HTTPS)`);
-console.log(`📂 Static server running on port ${port}, serving ${ROOT}`);
+// console.log(`📂 Static server running on port ${port}, serving ${ROOT}`);
 
 await app.listen({
   port:   port,
@@ -36,3 +36,5 @@ await app.listen({
   cert:   options.cert,
   key:    options.key,
 });
+
+// await app.listen({ port: port });

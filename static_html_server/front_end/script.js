@@ -30,7 +30,7 @@ document.getElementById("login").addEventListener("click", async (e) => {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/login", {
+    const res = await fetch("https://localhost:3000/login", {
       method:      "POST",
       headers:     { "Content-Type": "application/json" },
       credentials: "include",  // pour recevoir le cookie JWT

@@ -1,55 +1,91 @@
 /* menu.css */
 
 body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('background-1.png') center center no-repeat;
-    background-size: cover;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .menu-container {
-    background: rgba(33,24,73,1);
-    padding: 2rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  }
-  
-  .menu-container h1 {
-    color: #f0e9ff;
-    margin-bottom: 1.5rem;
-  }
-  
-  .mode-btn {
-    display: block;
-    width: 200px;
-    margin: 0.8rem auto;
-    padding: 0.8rem;
-    font-size: 1.1rem;
-    color: #fff;
-    background-color: #7e57c2;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.1s;
-  }
-  
-  .mode-btn:hover:not(.disabled) {
-    background-color: #9575cd;
-    transform: scale(1.02);
-  }
-  
-  .mode-btn:active:not(.disabled) {
-    transform: scale(0.98);
-  }
-  
-  .mode-btn.disabled {
-    background-color: #555;
-    cursor: not-allowed;
-  }
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('background-1.png') center center no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-container {
+  background: rgba(33,24,73,1);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.menu-container h1 {
+  color: #f0e9ff;
+  margin-bottom: 1.5rem;
+}
+
+.mode-btn {
+  display: block;
+  width: 200px;
+  margin: 0.8rem auto;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  color: #fff;
+  background-color: #7e57c2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s;
+}
+
+.mode-btn:hover:not(.disabled) {
+  background-color: #9575cd;
+  transform: scale(1.02);
+}
+
+.mode-btn:active:not(.disabled) {
+  transform: scale(0.98);
+}
+
+.mode-btn.disabled {
+  background-color: #555;
+  cursor: not-allowed;
+}
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background-color: #7e57c2;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.admin-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background-color: #7e57c2;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+
   

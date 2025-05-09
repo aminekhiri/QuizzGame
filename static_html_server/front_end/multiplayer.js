@@ -1,6 +1,6 @@
 // multiplayer.js
 
-const WS_URL = "ws://localhost:3000/multiplayer";
+const WS_URL = "wss://localhost:3000/multiplayer";
 
 let socket;
 let yourScore = 0;
@@ -133,3 +133,11 @@ window.addEventListener('DOMContentLoaded', () => {
   playAgain.addEventListener('click', () => location.reload());
   backMenu.addEventListener('click', () => window.location.href = 'menu.html');
 });
+
+
+
+// Gestionnaire pour le bouton "menu"
+document.getElementById('menu-btn')
+  .addEventListener('click', () => {
+    window.location.href = 'menu.html';
+  });
