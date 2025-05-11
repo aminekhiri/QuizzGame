@@ -37,7 +37,7 @@ async function doLogout() {
   try {
     await fetch("https://localhost:3000/logout", { credentials: "include" });
   } catch { /* ignore */ }
-  window.location.href = "login.html";
+  window.location.href = "../login/login.html";
 }
 
 /**
@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const menuBtn = document.getElementById("menu-btn");
   if (menuBtn) {
     menuBtn.addEventListener("click", () => {
-      window.location.href = "menu.html";
+      window.location.href = "../menu/menu.html";
     });
   }
 

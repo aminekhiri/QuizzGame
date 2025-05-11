@@ -2,7 +2,7 @@
 
 // Navigation vers la page d'inscription
 document.getElementById("register-btn").addEventListener("click", () => {
-  window.location.href = "register.html";
+  window.location.href = "../register/register.html";
 });
 
 function togglePassword() {
@@ -11,10 +11,10 @@ function togglePassword() {
 
   if (input.type === "password") {
       input.type = "text";
-      eye.src = "eye-closed.png";
+      eye.src = "../media/eye-closed.png";
   } else {
       input.type = "password";
-      eye.src = "eye-open.png";
+      eye.src = "../media/eye-open.png";
   }
 }
 
@@ -44,7 +44,8 @@ document.getElementById("login").addEventListener("click", async (e) => {
     }
 
     // Connexion réussie → on stocke le pseudo
-    localStorage.setItem("username", username);
+    sessionStorage.setItem("username", username);
+
 
     // Initialiser un score global si nécessaire
     if (!localStorage.getItem("bestScore_all_all")) {
@@ -52,7 +53,7 @@ document.getElementById("login").addEventListener("click", async (e) => {
     }
 
     // Rediriger vers le quiz
-    window.location.href = "menu.html";
+    window.location.href = "../menu/menu.html";
 
   } catch (err) {
     console.error(err);

@@ -3,13 +3,13 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('solo-btn')
-    .addEventListener('click', () => window.location.href = 'quizz.html');
+    .addEventListener('click', () => window.location.href = '../quizz/quizz.html');
   document.getElementById('multi-btn')
-    .addEventListener('click', () => window.location.href = 'multiplayer.html');
+    .addEventListener('click', () => window.location.href = '../multiplayer/multiplayer.html');
   document.getElementById('logout-btn')
     .addEventListener('click', doLogout);
     document.getElementById('admin-btn')
-    .addEventListener('click', () => window.location.href = 'admin.html'
+    .addEventListener('click', () => window.location.href = '../admin/admin.html'
     );
 });
 
@@ -28,7 +28,7 @@ async function doLogout() {
   localStorage.removeItem("password");
   
   // redirection vers la page de connexion
-  window.location.href = "login.html";
+  window.location.href = "../login/login.html";
 
 
 

@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: url('background-multi.png') center center no-repeat;
+    background: url('../media/background-multi.png') center center no-repeat;
     background-size: cover;
     color: #fff;
     display: flex;

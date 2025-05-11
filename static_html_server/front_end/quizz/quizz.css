@@ -5,7 +5,7 @@ html, body {
   padding: 0;
   height: 100%;
   /* dégradé violet de fond */
-  background: url(background-solo.png) center center no-repeat;
+  background: url('../media/background-solo.png') center center no-repeat;
   background-size: cover;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;

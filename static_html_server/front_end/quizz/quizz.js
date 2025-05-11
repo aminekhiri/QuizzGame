@@ -372,11 +372,11 @@ function resetQuizState() {
 // Gestionnaire pour le bouton "menu"
 document.getElementById('menu-btn')
   .addEventListener('click', () => {
-    window.location.href = 'menu.html';
+    window.location.href = '../menu/menu.html';
   });
 
 // Gestionnaire pour le bouton "profile"
 document.getElementById('profile-btn')
   .addEventListener('click', () => {
-    window.location.href = 'profile.html';
+    window.location.href = '../profile/profile.html';
   });

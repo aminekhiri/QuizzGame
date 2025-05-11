@@ -449,63 +449,58 @@ async function startMatch(
 ) {
   const questions = await pick10Questions();
   let idx = 0;
-
+  
   const scores: Record<string, number> = {
     [p1.username]: 0,
     [p2.username]: 0,
   };
 
-  // Indique si chaque joueur a déjà répondu à la question en cours
   let responded: Record<string, boolean> = {
     [p1.username]: false,
     [p2.username]: false,
   };
 
-  // 1) Envoi du match found
-  p1.ws.send(JSON.stringify({ type: "matched", opponent: p2.username }));
-  p2.ws.send(JSON.stringify({ type: "matched", opponent: p1.username }));
+  // ← déclaration des timers
+  let questionTimer: number;
 
-  // 2) Gestion des messages (réponses) pour chaque joueur
-  const handleAnswer = (player: { ws: WebSocket; username: string }) => {
-    player.ws.onmessage = ev => {
-      const msg = JSON.parse(ev.data);
-      if (msg.type !== "answer" || responded[player.username]) return;
-      // On ne compte qu’une seule réponse par question
-      responded[player.username] = true;
-      // Si la réponse est correcte, on incrémente le score de CE joueur
-      if (msg.answer === questions[idx].correct) {
-        scores[player.username]++;
-      }
-    };
-  };
-
-  handleAnswer(p1);
-  handleAnswer(p2);
-
-  function resetResponded() {
-    responded[p1.username] = false;
-    responded[p2.username] = false;
+  // envoie les scores et planifie la question suivante
+  function sendScores() {
+    [p1, p2].forEach(player => {
+      const other = player === p1 ? p2 : p1;
+      player.ws.send(JSON.stringify({
+        type:    "scores",
+        you:     scores[player.username],
+        them:    scores[other.username],
+        correct: questions[idx].correct
+      }));
+    });
+    // après 5 s, on passe à la prochaine question
+    setTimeout(() => {
+      idx++;
+      poseQuestion();
+    }, 5000);
   }
-  
 
-  // 3) Fonction récursive qui pose la question n°idx
-  const poseQuestion = () => {
+  // si les deux ont répondu, on annule l'ancien timer et envoie tout de suite
+  function trySendScoresEarly() {
+    if (responded[p1.username] && responded[p2.username]) {
+      clearTimeout(questionTimer);
+      sendScores();
+    }
+  }
+
+  function poseQuestion() {
     if (idx >= questions.length) {
-      // 4) Fin du match : on calcule l’issue pour chacun
       const s1 = scores[p1.username], s2 = scores[p2.username];
-      const out1 = s1 > s2 ? "win" : s1 < s2 ? "lose" : "draw";
-      const out2 = s2 > s1 ? "win" : s2 < s1 ? "lose" : "draw";
-
-      p1.ws.send(JSON.stringify({ type: "end", outcome: out1 }));
-      p2.ws.send(JSON.stringify({ type: "end", outcome: out2 }));
+      p1.ws.send(JSON.stringify({ type: "end", outcome: s1 > s2 ? "win" : s1 < s2 ? "lose" : "draw" }));
+      p2.ws.send(JSON.stringify({ type: "end", outcome: s2 > s1 ? "win" : s2 < s1 ? "lose" : "draw" }));
       return;
     }
 
-    // Réinitialise la traçabilité des réponses
+    // reset pour cette question
     responded[p1.username] = false;
     responded[p2.username] = false;
 
-    // 5) Envoi de la question synchronisée
     const q = questions[idx];
     [p1.ws, p2.ws].forEach(ws =>
       ws.send(JSON.stringify({
@@ -516,33 +511,29 @@ async function startMatch(
       }))
     );
 
-    // 6) Après la durée du timer, on diffuse les scores individuellement
-    setTimeout(() => {
-      [p1, p2].forEach(player => {
-        const other = player === p1 ? p2 : p1;     // ← récupère l’adversaire
-        player.ws.send(JSON.stringify({
-          type:    "scores",
-          you:     scores[player.username],
-          them:    scores[other.username],
-          correct: questions[idx].correct
-        }));
-      });
-      
+    // ← timer unique pour l'envoi des scores à la fin du chrono
+    questionTimer = setTimeout(sendScores, (q.time ?? 15) * 1000);
+  }
 
-      // 7) On attend encore 5 s pour que le client affiche vert/rouge
-      setTimeout(() => {
-        idx++;
-        poseQuestion();
-      }, 5000);
+  function handleAnswer(player: { ws: WebSocket; username: string }) {
+    player.ws.onmessage = ev => {
+      const msg = JSON.parse(ev.data);
+      if (msg.type !== "answer" || responded[player.username]) return;
+      responded[player.username] = true;
+      if (msg.answer === questions[idx].correct) {
+        scores[player.username]++;
+      }
+      trySendScoresEarly();
+    };
+  }
 
-    }, (q.time ?? 15) * 1000);
-  };
+  handleAnswer(p1);
+  handleAnswer(p2);
 
-  resetResponded(); 
-
-  // 8) Lancement de la première question
+  // démarrage
   poseQuestion();
 }
+
 
 
 // file d’attente globale
@@ -590,8 +581,8 @@ app.use(router.allowedMethods());
 
 const options = {
   port: 3000,
-  cert: await Deno.readTextFile("./cert.pem"),
-  key: await Deno.readTextFile("./key.pem"),
+  cert: await Deno.readTextFile("./certificate/cert.pem"),
+  key: await Deno.readTextFile("./certificate/key.pem"),
 };
 
 // Démarrage avec le listener personnalisé

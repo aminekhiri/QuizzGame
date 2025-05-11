@@ -6,10 +6,10 @@ function togglePassword() {
 
   if (input.type === "password") {
       input.type = "text";
-      eye.src = "eye-closed.png";
+      eye.src = "../media/eye-closed.png";
   } else {
       input.type = "password";
-      eye.src = "eye-open.png";
+      eye.src = "../media/eye-open.png";
   }
 }
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
         if (res.status === 201) {
           alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-          window.location.href = "login.html";
+          window.location.href = "../login/login.html";
         } else if (res.status === 409) {
           const { message } = await res.json();
           alert(message);
