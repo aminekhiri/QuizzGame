@@ -1,6 +1,7 @@
-// profile.js
-
 document.addEventListener('DOMContentLoaded', async () => {
+  // 0) Récupérer le token JWT stocké (sessionStorage)
+  const token = sessionStorage.getItem('jwt');
+
   // 1) Récupérer les éléments du DOM
   const elUsername  = document.getElementById('p-username');
   const elFirstname = document.getElementById('p-firstname');
@@ -11,7 +12,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   let username = '', first_name = '', last_name = '';
   try {
     const res = await fetch('https://localhost:3000/api/me', {
-      credentials: 'include'
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     ({ username, first_name, last_name } = await res.json());
@@ -28,7 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   let bestScores = [];
   try {
     const res = await fetch('https://localhost:3000/api/best-scores', {
-      credentials: 'include'
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     bestScores = await res.json();
@@ -43,14 +52,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   } else {
     bestScores.forEach(({ category, difficulty, question_count, best_score }) => {
       const li = document.createElement('li');
-      li.textContent = 
+      li.textContent =
         `${category} — ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} — ` +
         `${question_count} questions : ${best_score}`;
       ulScores.appendChild(li);
     });
   }
 
-  //6) Bouton de suppression de compte
+  // 6) Bouton de suppression de compte
   const deleteBtn = document.getElementById('delete-account-btn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
@@ -58,11 +67,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       try {
-        const token = sessionStorage.getItem("jwt");
         const res = await fetch('https://localhost:3000/api/me', {
+          method:      'DELETE',
+          credentials: 'include',
           headers: {
-            "Content-Type": "application/json",
-            "Authorization":`Bearer ${token}`
+            'Authorization': `Bearer ${token}`
           }
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

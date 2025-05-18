@@ -1,9 +1,11 @@
 // server.ts
 
 import { Application, send } from "https://deno.land/x/oak@v12.6.1/mod.ts";
-
+import { load } from "https://deno.land/std@0.184.0/dotenv/mod.ts";
+await load({ export: true });  
 const app = new Application();
 const ROOT = `${Deno.cwd()}/front_end/`;
+
 
 // Middleware principal : envoie le fichier demandé ou index.html
 app.use(async (ctx) => {

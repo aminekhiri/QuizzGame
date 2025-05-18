@@ -12,7 +12,6 @@ import { create, verify, getNumericDate }from "https://deno.land/x/djwt@v2.8/mod
 import { DB }                            from "https://deno.land/x/sqlite@v3.9.1/mod.ts";
 
 
-
 // ——— Paramètres
 const RAW_SECRET = new TextEncoder().encode(Deno.env.get("JWT_SECRET")!);
 const DB_FILE    = Deno.env.get("SQLITE_FILE") || "quiz.db";
@@ -145,8 +144,8 @@ app.use(async (ctx, next) => {
   const origin = ctx.request.headers.get("Origin") ?? "";
   ctx.response.headers.set("Access-Control-Allow-Origin", origin);
   ctx.response.headers.set("Access-Control-Allow-Credentials", "true");
-  ctx.response.headers.set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
-  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+  ctx.response.headers.set("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
+  ctx.response.headers.set("Access-Control-Allow-Headers", "Content-Type,Authorization");
 
   if (ctx.request.method === "OPTIONS") {
     // on répond directement, sans next()
@@ -177,7 +176,7 @@ async function auth(ctx: Context, next: () => Promise<unknown>) {
   }
   try {
     const payload = await verify(token, SECRET, "HS256");
-    ctx.state.username = payload.iss as string;
+    ctx.state.username = payload.iss;
     await next();
   } catch {
     ctx.response.status = 401;
@@ -476,7 +475,7 @@ router.post("/login", async (ctx) => {
       httpOnly: true,
       secure:   true,
       sameSite: "none",
-      maxAge:   60 * 60,
+      maxAge:   3600,
       path:     "/"
     });
 
