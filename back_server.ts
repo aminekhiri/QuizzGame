@@ -133,17 +133,10 @@ const app = new Application();
 
 // ——— CORS global
 app.use(oakCors({
-  origin: (requestOrigin) => {
-    // autorise http://localhost:8080 ET https://localhost:8080
-    if (
-      requestOrigin === "http://localhost:8080" ||
-      requestOrigin === "https://localhost:8080"
-    ) {
-      return requestOrigin;
-    }
-    return ""; // sinon origin refusée
-  },
+  origin: "https://localhost:8080",
   credentials: true,
+  allowMethods: ["GET", "POST", "DELETE", "OPTIONS"],
+  allowHeaders: ["Content-Type"]
 }));
 
 
@@ -167,19 +160,28 @@ app.use(async (ctx, next) => {
 
 // ——— Middleware d’authentification
 async function auth(ctx: Context, next: () => Promise<unknown>) {
-  const token = await ctx.cookies.get("jwt");
+  // 1) Rechercher Bearer token dans Authorization
+  const authHeader = ctx.request.headers.get("Authorization");
+  let token: string | null = null;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.slice(7);
+  }
+  // 2) Sinon, fallback sur cookie
+  if (!token) {
+    token = await ctx.cookies.get("jwt") || null;
+  }
   if (!token) {
     ctx.response.status = 401;
-    ctx.response.body   = { message: "Non autorisé" };
+    ctx.response.body = { message: "Missing token" };
     return;
   }
   try {
-    const payload = await verify(token, SECRET);
-    ctx.state.username = payload.iss;
+    const payload = await verify(token, SECRET, "HS256");
+    ctx.state.username = payload.iss as string;
     await next();
   } catch {
     ctx.response.status = 401;
-    ctx.response.body   = { message: "Token invalide" };
+    ctx.response.body = { message: "Invalid or expired token" };
   }
 }
 
@@ -231,38 +233,187 @@ router.get(
 );
 
 
+//route pour supprimer un compte utilisateur
+/**
+ * DELETE /api/me
+ * Supprime l’utilisateur connecté et toutes ses données associées
+ */
+router.delete("/api/me", auth, async (ctx: Context) => {
+  const username = ctx.state.username as string;
+
+  try {
+    // 1) Supprimer les réponses de sessions de quiz
+    db.query(
+      `DELETE FROM session_answers
+         WHERE session_id IN (
+           SELECT session_id FROM quiz_sessions WHERE username = ?
+         );`,
+      [username],
+    );
+
+    // 2) Supprimer les sessions de quiz
+    db.query(
+      `DELETE FROM quiz_sessions WHERE username = ?;`,
+      [username],
+    );
+
+    // 3) Supprimer les meilleurs scores
+    db.query(
+      `DELETE FROM best_scores WHERE username = ?;`,
+      [username],
+    );
+
+    // 4) Supprimer l’utilisateur
+    db.query(
+      `DELETE FROM users WHERE username = ?;`,
+      [username],
+    );
+
+    // 5) Invalider le cookie JWT côté client
+    ctx.cookies.delete("jwt", { path: "/" });
+
+    // 6) Répondre 204 No Content
+    ctx.response.status = 204;
+  } catch (err) {
+    console.error("Erreur suppression compte et données associées :", err);
+    ctx.response.status = 500;
+    ctx.response.body = { message: "Erreur interne lors de la suppression du compte" };
+  }
+});
+
+
+
 
 // Route pour finir un quiz et sauvegarder session + best_scores
-router.post("/api/quiz/complete", auth, async (ctx) => {
+router.post("/api/quiz/complete", auth, async (ctx: Context) => {
   const username = ctx.state.username as string;
   const {
-    category_id,
-    difficulty_id,
+    category_code,
+    difficulty_level,
     total_score,
-    question_count   // ← récupéré depuis le front
+    question_count
   } = await ctx.request.body({ type: "json" }).value;
 
-  // 1) Enregistrement de la session
+  // 0) Valider les entrées
+  // Si vous autorisez "all", gérez-le ici (e.g. en SKIPPANT l'upsert dans best_scores)
+  if (!category_code || !difficulty_level) {
+    ctx.response.status = 400;
+    ctx.response.body   = { message: "Category code et difficulty level requis" };
+    return;
+  }
+
+  // 1) Récupérer category_id
+  const catRows = [...db.query(
+    `SELECT category_id
+       FROM categories
+      WHERE code = ?`,
+    [category_code],
+  )];
+  if (!catRows.length) {
+    ctx.response.status = 400;
+    ctx.response.body   = { message: "Code de catégorie invalide" };
+    return;
+  }
+  const category_id = catRows[0][0] as number;
+
+  // 2) Récupérer difficulty_id
+  const diffRows = [...db.query(
+    `SELECT difficulty_id
+       FROM difficulties
+      WHERE level = ?`,
+    [difficulty_level],
+  )];
+  if (!diffRows.length) {
+    ctx.response.status = 400;
+    ctx.response.body   = { message: "Niveau de difficulté invalide" };
+    return;
+  }
+  const difficulty_id = diffRows[0][0] as number;
+
+  // 3) Enregistrement de la session
   db.query(`
     INSERT INTO quiz_sessions
       (username, category_id, difficulty_id, total_score)
     VALUES (?,?,?,?)
   `, [username, category_id, difficulty_id, total_score]);
 
-  // 2) Upsert best_scores en incluant question_count
+  // 4) Upsert best_scores
   db.query(`
     INSERT INTO best_scores
-      (username, category_id, difficulty_id, question_count, best_score)
+      (username, category_id, difficulty_id, question_count, total_score)
     VALUES (?,?,?,?,?)
     ON CONFLICT(username, category_id, difficulty_id, question_count)
     DO UPDATE SET best_score = excluded.best_score
-      WHERE excluded.best_score > best_scores.best_score
+      WHERE excluded.best_score > best_scores.best_score;
   `, [username, category_id, difficulty_id, question_count, total_score]);
 
+    // DEBUG — confirmer ce qui a été écrit
+  console.log("▶ best_scores for", username, [...db.query(
+    `SELECT category_id, difficulty_id, question_count, best_score
+       FROM best_scores
+      WHERE username = ?`,
+    [username]
+  )]);
+
+
   ctx.response.status = 200;
-  ctx.response.body   = { message: "Session enregistrée" };
+  ctx.response.body   = { message: "Session et best score enregistrés" };
 });
 
+
+/**
+ * DELETE /api/admin/users/:username
+ * Permet à un admin de supprimer un utilisateur et toutes ses données
+ */
+router.delete(
+  "/api/admin/users/:username",
+  auth,
+  adminOnly,
+  async (ctx: Context) => {
+    const targetUser = ctx.params.username!;
+    try {
+      // 1) Supprimer les réponses de sessions
+      db.query(
+        `DELETE FROM session_answers
+           WHERE session_id IN (
+             SELECT session_id FROM quiz_sessions WHERE username = ?
+           );`,
+        [targetUser],
+      );
+      // 2) Supprimer les sessions de quiz
+      db.query(
+        `DELETE FROM quiz_sessions WHERE username = ?;`,
+        [targetUser],
+      );
+      // 3) Supprimer les best_scores
+      db.query(
+        `DELETE FROM best_scores WHERE username = ?;`,
+        [targetUser],
+      );
+      // 4) Supprimer l’utilisateur
+      db.query(
+        `DELETE FROM users WHERE username = ?;`,
+        [targetUser],
+      );
+
+      ctx.response.status = 204; // No Content
+    } catch (err) {
+      console.error("Erreur suppression utilisateur admin:", err);
+      ctx.response.status = 500;
+      ctx.response.body = { message: "Erreur interne lors de la suppression" };
+    }
+  }
+);
+
+
+/**
+ * POST /admin/users/:username
+ */
+router.post("/admmin/users/:username",
+  auth,
+  adminOnly,
+  
+)
 
 /**
  * POST /signup
@@ -323,11 +474,13 @@ router.post("/login", async (ctx) => {
 
     ctx.cookies.set("jwt", jwt, {
       httpOnly: true,
+      secure:   true,
+      sameSite: "none",
       maxAge:   60 * 60,
       path:     "/"
     });
 
-    ctx.response.body = { message: "Login successful" };
+    ctx.response.body = { message: "Login successful", token: jwt };
   } catch (err) {
     ctx.response.status = 400;
     ctx.response.body   = { message: "Invalid request", error: err.message };
@@ -375,25 +528,32 @@ router.get("/api/me", auth, (ctx) => {
  * GET /api/best-scores
  * Renvoie tous les meilleurs scores de l'utilisateur connecté
  */
-router.get("/api/best-scores", auth, (ctx) => {
+router.get("/api/best-scores", auth, (ctx: Context) => {
   const username = ctx.state.username as string;
-  // On joint best_scores → categories → difficulties pour remonter labels
+
+  // On joint categories & difficulties pour récupérer leur libellé
   const rows = [...db.query(`
-    SELECT c.name, d.level, b.best_score
-    FROM best_scores b
-    JOIN categories c   ON b.category_id   = c.category_id
-    JOIN difficulties d ON b.difficulty_id = d.difficulty_id
-    WHERE b.username = ?
+    SELECT
+      c.name        AS category,
+      d.level       AS difficulty,
+      bs.question_count,
+      bs.best_score
+    FROM best_scores bs
+    JOIN categories c  ON bs.category_id   = c.category_id
+    JOIN difficulties d ON bs.difficulty_id = d.difficulty_id
+    WHERE bs.username = ?;
   `, [username])];
 
-  // Transforme en JSON
-  const result = rows.map(([category, difficulty, best_score]) => ({
-    category,
-    difficulty,
-    score: best_score
+  const bestScores = rows.map((
+    [category, difficulty, question_count, best_score]
+  ) => ({
+    category:        category as string,
+    difficulty:      difficulty as string,
+    question_count:  question_count as number,
+    best_score:      best_score as number,
   }));
 
-  ctx.response.body = result;
+  ctx.response.body = bestScores;
 });
 
 
@@ -409,6 +569,18 @@ router.get("/quiz", auth, async (ctx) => {
     index: "quizz.html",
   });
 });
+
+
+
+//Pour le multijoueur on va utiliser un WebSocket
+
+// en haut de back_server.ts
+function safeSend(ws: WebSocket, data: unknown) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify(data));
+  }
+}
+
 
 /** Mélange un tableau en place (Fisher–Yates) */
 function shuffle<T>(arr: T[]): T[] {
@@ -431,7 +603,7 @@ async function pick10Questions() {
   const data = await res.json(); //récupère les données
 
   // 2) Formater chaque question
-  return data.map((q: any) => {
+  return data.map((q : any) => {
     // texte brut (string ou { text })
     const text = typeof q.question === 'object' ? q.question.text : q.question;
 
@@ -449,70 +621,65 @@ async function startMatch(
 ) {
   const questions = await pick10Questions();
   let idx = 0;
-  
+
   const scores: Record<string, number> = {
     [p1.username]: 0,
     [p2.username]: 0,
   };
 
-  let responded: Record<string, boolean> = {
+  const responded: Record<string, boolean> = {
     [p1.username]: false,
     [p2.username]: false,
   };
 
-  // ← déclaration des timers
-  let questionTimer: number;
+  
+  safeSend(p1.ws, { type: 'matched', opponent: p2.username });
+  safeSend(p2.ws, { type: 'matched', opponent: p1.username });
 
-  // envoie les scores et planifie la question suivante
-  function sendScores() {
-    [p1, p2].forEach(player => {
-      const other = player === p1 ? p2 : p1;
-      player.ws.send(JSON.stringify({
-        type:    "scores",
-        you:     scores[player.username],
-        them:    scores[other.username],
-        correct: questions[idx].correct
-      }));
-    });
-    // après 5 s, on passe à la prochaine question
-    setTimeout(() => {
-      idx++;
-      poseQuestion();
-    }, 5000);
-  }
 
-  // si les deux ont répondu, on annule l'ancien timer et envoie tout de suite
-  function trySendScoresEarly() {
-    if (responded[p1.username] && responded[p2.username]) {
-      clearTimeout(questionTimer);
-      sendScores();
-    }
-  }
 
   function poseQuestion() {
     if (idx >= questions.length) {
       const s1 = scores[p1.username], s2 = scores[p2.username];
-      p1.ws.send(JSON.stringify({ type: "end", outcome: s1 > s2 ? "win" : s1 < s2 ? "lose" : "draw" }));
-      p2.ws.send(JSON.stringify({ type: "end", outcome: s2 > s1 ? "win" : s2 < s1 ? "lose" : "draw" }));
+      safeSend(p1.ws, { type: "end", outcome: s1 > s2 ? "win" : s1 < s2 ? "lose" : "draw" });
+      safeSend(p2.ws, { type: "end", outcome: s2 > s1 ? "win" : s2 < s1 ? "lose" : "draw" });
       return;
     }
 
-    // reset pour cette question
+    // reset responses
     responded[p1.username] = false;
     responded[p2.username] = false;
 
     const q = questions[idx];
+    const currentIdx = idx;
     [p1.ws, p2.ws].forEach(ws =>
-      ws.send(JSON.stringify({
+      safeSend(ws, {
         type:     "question",
         question: q.text,
         choices:  q.choices,
         time:     q.time ?? 15
-      }))
+      })
     );
 
-    // ← timer unique pour l'envoi des scores à la fin du chrono
-    questionTimer = setTimeout(sendScores, (q.time ?? 15) * 1000);
+  // À la fin du chrono de cette question, on envoie les scores
+  setTimeout(() => {
+    [p1, p2].forEach(player => {
+      const other = player === p1 ? p2 : p1;
+      safeSend(player.ws, {
+        type:    "scores",
+        you:     scores[player.username],
+        them:    scores[other.username],
+        correct: questions[currentIdx].correct
+      });
+    });
+
+
+      //On attend 5 secondes après le reveal de la réponse pour passer à la question suivante
+      setTimeout(() => {
+        idx++;
+        poseQuestion();
+      }, 5000);
+    }, (q.time ?? 15) * 1000);
   }
 
   function handleAnswer(player: { ws: WebSocket; username: string }) {
@@ -523,14 +690,12 @@ async function startMatch(
       if (msg.answer === questions[idx].correct) {
         scores[player.username]++;
       }
-      trySendScoresEarly();
     };
   }
 
   handleAnswer(p1);
   handleAnswer(p2);
 
-  // démarrage
   poseQuestion();
 }
 
@@ -597,3 +762,4 @@ await app.listen({
 
 // console.log("🚀 Back-end HTTP sur http://localhost:3000");
 // await app.listen({ port: 3000 });
+

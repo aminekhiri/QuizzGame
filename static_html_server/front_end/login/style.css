@@ -36,6 +36,16 @@ label {
     transition: box-shadow 0.3s ease;
 }
 
+#register-btn {
+    margin-bottom: 1rem; 
+}
+
+.password-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 1.5rem; /* au lieu de 0, pour séparer du bouton Login */
+}
+
 input:focus {
     outline: none;
     box-shadow: 0 0 10px #bb86fc;
@@ -117,4 +127,7 @@ button:active {
     font-size: 1.8em;
     color: #fff;
     }
-    
+  
+#login {
+    margin-bottom: 1.5rem; /* espace entre Login et Register */
+}

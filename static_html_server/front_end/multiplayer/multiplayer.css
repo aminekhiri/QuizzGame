@@ -108,3 +108,6 @@ body {
     transition: background-color 0.2s;
   }
   
+.hidden {
+    display: none;
+}

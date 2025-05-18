@@ -5,7 +5,7 @@
   <title>Mon Profil</title>
   <link rel="stylesheet" href="profile.css">
   <script src="profile.js" defer></script>
-  <link rel="icon" type="image/x-icon" href="brain.png">
+  <link rel="icon" type="image/x-icon" href="../media/brain.png">
 </head>
 <body>
   <div class="profile-container">
@@ -20,12 +20,16 @@
     <div class="profile-item">
       Last name : <strong id="p-lastname"></strong>
     </div>
-    <div class="profile-item">
-      Password : <strong id="p-password"></strong>
-    </div>
 
     <h2>Best scores</h2>
     <ul id="scores-list" class="scores-list"></ul>
+
+    <div>    
+      <button id="delete-account-btn" class="delete-btn">
+      Delete my account
+    </button>
+    </div>
+
 
     <a href="../quizz/quizz.html" class="back">← Back</a>
   </div>

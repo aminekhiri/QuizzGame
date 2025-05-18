@@ -12,46 +12,74 @@ body {
   justify-content: center;
 }
 
-.menu-container {
-  background: rgba(33,24,73,1);
+
+h1 {
+  font-size: 2.5rem;
+  color: #f0e9ff; /* texte clair */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.game-modes {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.mode-card {
+  background: rgba(33, 24, 73, 0.9); /* même violet foncé que votre menu */
   padding: 2rem;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  width: 300px;
+  height: 300px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  transition: transform 0.2s ease;
+  margin-right: 10px;
+}
+.mode-card:hover {
+  transform: translateY(-4px);
 }
 
-.menu-container h1 {
-  color: #f0e9ff;
+.mode-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+.mode-card h3 {
+  font-size: 1.5rem;
+  color: #f0e9ff;      /* texte clair */
+  margin-bottom: 0.5rem;
+}
+
+.mode-card p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
   margin-bottom: 1.5rem;
 }
 
 .mode-btn {
-  display: block;
-  width: 200px;
-  margin: 0.8rem auto;
-  padding: 0.8rem;
-  font-size: 1.1rem;
+  padding: 0.7rem 1.8rem;
+  font-size: 1rem;
   color: #fff;
-  background-color: #7e57c2;
+  background-color: #7e57c2;  /* violet principal */
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s;
+  transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-.mode-btn:hover:not(.disabled) {
-  background-color: #9575cd;
+.mode-btn:hover {
+  background-color: #9575cd;  /* violet clair au survol */
   transform: scale(1.02);
 }
 
-.mode-btn:active:not(.disabled) {
+.mode-btn:active {
   transform: scale(0.98);
 }
 
-.mode-btn.disabled {
-  background-color: #555;
-  cursor: not-allowed;
-}
 
 .logout-btn {
   position: absolute;

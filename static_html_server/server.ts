@@ -3,7 +3,6 @@
 import { Application, send } from "https://deno.land/x/oak@v12.6.1/mod.ts";
 
 const app = new Application();
-const USE_HTTPS = Deno.args.includes("--https");
 const ROOT = `${Deno.cwd()}/front_end/`;
 
 // Middleware principal : envoie le fichier demandé ou index.html

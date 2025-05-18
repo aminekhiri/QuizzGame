@@ -13,6 +13,7 @@ function togglePassword() {
   }
 }
 
+
 document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('signup-btn');
   

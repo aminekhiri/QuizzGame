@@ -23,11 +23,15 @@ function startTimer(sec) {
       clearInterval(timerInterval);
       // désactive les boutons
       disableAnswerButtons();
-      // envoie la dernière réponse mémorisée (ou null)
+
+      if (selectedAnswer===null){
+              // envoie la dernière réponse mémorisée (ou null si on a répondu à rien)
       socket.send(JSON.stringify({
         type:   'answer',
         answer: selectedAnswer
       }));
+      }
+
     }
   }, 1000);
 }
@@ -54,7 +58,12 @@ function renderQuestion(q) {
       selectedBtn    = btn;
       selectedAnswer = choice;
       btn.classList.add('selected');
-      // on n'envoie rien ici, on attend la fin du chrono
+     
+      //on tente 
+      socket.send(JSON.stringify({
+        type: 'answer',
+        answer: selectedAnswer
+      }));
     };
     ans.appendChild(btn);
   });
@@ -85,18 +94,18 @@ function showResult(outcome) {
   show(document.getElementById('result-screen'));
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+globalThis.addEventListener('DOMContentLoaded', () => {
   const status       = document.getElementById('status');
   const matchInfo    = document.getElementById('match-info');
-  const opponentName = document.getElementById('opponent-name');
   const questionBox  = document.getElementById('question-box');
   const nextBtn      = document.getElementById('next-btn');
   const playAgain    = document.getElementById('play-again');
   const backMenu     = document.getElementById('back-menu');
+  const opponentName = document.getElementById('opponent-name');
 
   socket = new WebSocket(WS_URL);
   socket.onopen = () => {
-    status.textContent = 'waiting for an opponent…';
+    
     // envoie ton username pour identification
     const me = sessionStorage.getItem('username') || 'Invité';
 
@@ -109,8 +118,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const msg = JSON.parse(ev.data);
     switch (msg.type) {
       case 'matched':
-        status.style.display = 'none';
-        matchInfo.textContent = `You are playing against : ${msg.opponent}`; // On affiche le nom de l'adversaire
+        document.getElementById('waiting').style.display = 'none'; //on cache le waiting
+        status.style.display = 'none'; //on cache le server connection
+
+        opponentName.textContent = msg.opponent; //on affiche le nom de l'adversaire
+        matchInfo.style.display = 'block'
+
         show(matchInfo);
         break;
       case 'question':
@@ -127,7 +140,7 @@ window.addEventListener('DOMContentLoaded', () => {
             if (b.textContent === msg.correct) 
               b.classList.add('correct');
             });
-            // ⓷ si on a fait un mauvais choix, on le colore en rouge
+            // si on a fait un mauvais choix, on le colore en rouge
             if (selectedBtn && !selectedBtn.classList.contains('correct')) {
                 selectedBtn.classList.add('wrong');
             }

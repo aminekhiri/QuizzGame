@@ -114,6 +114,7 @@ function showFinalScreen() {
   document.getElementById('new-quiz-btn').style.display = 'block';
   document.getElementById('final-score').textContent     = score;
   document.getElementById('total-questions').textContent = MAX_QUESTIONS;
+  document.getElementById('hud').style.display = 'none';
 
 }
 
@@ -215,11 +216,18 @@ function startTimer() {
 }
 
 
-async function completeQuiz() {
+async function _completeQuiz() {
   if (!quizCompleted) {
     return;
   }
   try {
+
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      alert("Vous n'êtes pas connecté")
+      return;
+    }
+
     // On récupère la catégorie et la difficulté sélectionnées
     const payload = {
       category_code   : currentCategory   || 'all',
@@ -241,8 +249,7 @@ async function completeQuiz() {
       throw new Error(err.message || "Erreur enregistrement quiz");
     }
 
-    alert("Votre score a bien été enregistré !");
-    window.location.href = "profile.html";
+
 
   } catch (err) {
     console.error(err);
@@ -265,6 +272,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cfg     = document.getElementById('config');
   const qbox    = document.getElementById('question-box');
   const start   = document.getElementById('start-btn');
+  const hud = document.getElementById('hud');
 
 
   start.addEventListener('click', async () => {
@@ -278,6 +286,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentDifficulty = selDiff.value;
     cfg.style.display  = 'none';
     qbox.style.display = 'block';
+    hud.style.display = 'block';
+
 
     document.getElementById('quit-btn').style.display = 'block';
 
@@ -327,10 +337,10 @@ async function doLogout() {
   // Object.keys(localStorage).forEach(k => k.startsWith('bestScore_') && localStorage.removeItem(k));
 
   // redirection vers la page de connexion
-  window.location.href = "login.html";
+  window.location.href = "../login/login.html";
 }
 
-document.getElementById('logout-btn').addEventListener('click', (e) => {
+document.getElementById('logout-btn').addEventListener('click', (_e) => {
   doLogout();
 });
 

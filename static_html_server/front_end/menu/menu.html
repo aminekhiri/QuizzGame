@@ -5,15 +5,28 @@
   <title>Quiz Game Menu</title>
   <link rel="stylesheet" href="menu.css">
   <script src="menu.js" defer></script>
-  <link rel="icon" type="image/x-icon" href="brain.png">
+  <link rel="icon" type="image/x-icon" href="../media/brain.png">
 </head>
 <body>
   <div class="menu-container">
-    <h1>Choose a game mode</h1>
-    <button id="admin-btn" class="admin-btn">Admin Dashboard</button>
-    <button id="solo-btn"    class="mode-btn">Solo</button>
-    <button id="multi-btn"   class="mode-btn">Multiplayer</button>
+
+    <div id="admin-btn"> <button id="admin-btn" class="admin-btn">Admin Dashboard</button></div>
     <button href="login.html" id="logout-btn" class="logout-btn" title="Logout">Logout</button>
+    
+    <div class="game-modes">
+      <div class="mode-card">
+        <img src="../media/solo-icon.png" alt="Mode Solo" class="mode-icon">
+        <h3>Solo</h3>
+        <p>Challenge yourself to reach your best score</p>
+        <button id="solo-btn" class="mode-btn">Play now</button>
+      </div>
+      <div class="mode-card">
+        <img src="../media/multi-icon.png" alt="Mode Multijoueur" class="mode-icon">
+        <h3>Multiplayer</h3>
+        <p>Challenge random players in an online match</p>
+        <button id="multi-btn" class="mode-btn">Play now</button>
+      </div>
+    </div>
   </div>
 </body>
 </html>

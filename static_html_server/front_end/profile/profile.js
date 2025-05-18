@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 5) Afficher la liste
   ulScores.innerHTML = '';
   if (bestScores.length === 0) {
-    ulScores.innerHTML = '<li>Aucun meilleur score enregistré.</li>';
+    ulScores.innerHTML = '<li>No best score recorded</li>';
   } else {
     bestScores.forEach(({ category, difficulty, question_count, best_score }) => {
       const li = document.createElement('li');
@@ -47,6 +47,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         `${category} — ${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)} — ` +
         `${question_count} questions : ${best_score}`;
       ulScores.appendChild(li);
+    });
+  }
+
+  //6) Bouton de suppression de compte
+  const deleteBtn = document.getElementById('delete-account-btn');
+  if (deleteBtn) {
+    deleteBtn.addEventListener('click', async () => {
+      if (!confirm('Êtes-vous sûr de vouloir supprimer définitivement votre compte ?')) {
+        return;
+      }
+      try {
+        const token = sessionStorage.getItem("jwt");
+        const res = await fetch('https://localhost:3000/api/me', {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization":`Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        // rediriger après suppression
+        alert('Votre compte a été supprimé.');
+        window.location.href = '../login/login.html';
+      } catch (err) {
+        console.error('Erreur suppression compte :', err);
+        alert('Une erreur est survenue lors de la suppression de votre compte.');
+      }
     });
   }
 });

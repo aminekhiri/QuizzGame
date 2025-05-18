@@ -35,3 +35,25 @@ html, body {
     color: #bb86fc;
     text-decoration: none;
   }
+
+.delete-btn {
+  margin: 1.5rem 0;
+  margin-top: 50px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  background-color: #c62828;     /* rouge sombre pour l’effet “Danger” */
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.delete-btn:hover {
+  background-color: #e53935;
+  transform: scale(1.02);
+}
+
+.delete-btn:active {
+  transform: scale(0.98);
+}

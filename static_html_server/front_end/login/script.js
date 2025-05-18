@@ -37,7 +37,9 @@ document.getElementById("login").addEventListener("click", async (e) => {
       body:        JSON.stringify({ username, password })
     });
 
-    const body = await res.json();
+    const {token} = await res.json()
+    sessionStorage.setItem("jwt", token)
+
     if (!res.ok) {
       // Affiche le message d’erreur renvoyé par le back
       throw new Error(body.message || "Échec de la connexion");
@@ -48,8 +50,8 @@ document.getElementById("login").addEventListener("click", async (e) => {
 
 
     // Initialiser un score global si nécessaire
-    if (!localStorage.getItem("bestScore_all_all")) {
-      localStorage.setItem("bestScore_all_all", "0");
+    if (!sessionStorage.getItem("bestScore_all_all")) {
+      sessionStorage.setItem("bestScore_all_all", "0");
     }
 
     // Rediriger vers le quiz
