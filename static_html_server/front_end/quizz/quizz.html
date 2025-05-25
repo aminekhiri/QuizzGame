@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizzy</title>
+  <link rel="stylesheet" href="quizz.css">
+  <script src="quizz.js" defer></script>
+  <link rel="icon" type="image/x-icon" href="../media/brain.png">
+
+</head>
+<body>
+  
+  <button id="profile-btn" class="profile-btn" title="Mon profil">
+    <img src="../media/profile-icon.png" alt="Profil" class="profile-icon">My Profile</button>
+  <button id="logout-btn" class="logout-btn" title="Logout">Logout</button>
+  <button id="menu-btn" class="menu-btn" title="Menu">Menu</button>
+  
+  <div class="quiz-container">
+    <h1>Solo Quiz</h1>
+
+    <div id="config">
+      <label for="category-select">Choose a theme :</label>
+      <select id="category-select">
+        <option value="" disabled selected>Loading…</option>
+      </select><br><br>
+    
+      <label for="difficulty-select">Choose a difficulty :</label>
+      <select id="difficulty-select">
+        <option value="" disabled selected>Loading…</option>
+      </select><br><br>
+
+      <label for="question-number-select">Number of questions :</label>
+      <select id="question-number-select"></select><br><br>
+
+    
+      <button id="start-btn">Start the quiz</button>
+
+
+    </div>
+
+
+    <div id="hud">
+      <br>
+      <span>Score : <strong id="score">0</strong></span><br><br>
+      
+      <span>Time left : <strong id="timer">00</strong></span><br><br>
+
+      
+    </div>
+
+    <div id="question-box" style="display:none;">
+      <div id="question-counter" class="counter">Question 0/10</div>
+
+      <p class="question">Question…</p>
+      <div class="answers"></div>
+      <button id="next-btn">Question suivante</button><br><br>
+      <button id="quit-btn" style="display: none">Quit</button>
+      
+    </div>
+
+    <!-- écran de fin -->
+    <div id="final-screen" style="display:none; text-align:center;">
+      <h2>Quiz completed !</h2>
+      <p>Your score : <span id="final-score"></span> / <span id="total-questions"></span></p>
+      <button id="new-quiz-btn" style="display: none">New Quiz</button><br><br>
+    </div>
+
+      
+  
+    
+
+    <div id="question-box" style="display:none;">
+      <p class="question">Question…</p>
+      <div class="answers"></div>
+      <button id="next-btn">Next question</button><br>
+
+    </div>
+  </div>
+</body>
+</html>

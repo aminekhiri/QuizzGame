@@ -1,0 +1,119 @@
+/* menu.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: url('../media/background-1.png') center center no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+h1 {
+  font-size: 2.5rem;
+  color: #f0e9ff; /* texte clair */
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.game-modes {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.mode-card {
+  background: rgba(33, 24, 73, 0.9); /* même violet foncé que votre menu */
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  width: 300px;
+  height: 300px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85);
+  transition: transform 0.2s ease;
+  margin-right: 10px;
+}
+.mode-card:hover {
+  transform: translateY(-4px);
+}
+
+.mode-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 1rem;
+}
+
+.mode-card h3 {
+  font-size: 1.5rem;
+  color: #f0e9ff;      /* texte clair */
+  margin-bottom: 0.5rem;
+}
+
+.mode-card p {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+.mode-btn {
+  padding: 0.7rem 1.8rem;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #7e57c2;  /* violet principal */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.mode-btn:hover {
+  background-color: #9575cd;  /* violet clair au survol */
+  transform: scale(1.02);
+}
+
+.mode-btn:active {
+  transform: scale(0.98);
+}
+
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background-color: #7e57c2;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+.admin-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 1.5em;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background-color: #7e57c2;
+  color: #fff;
+  transition: background-color 0.2s;
+}
+
+
+  

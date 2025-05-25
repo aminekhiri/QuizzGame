@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MultiQuizzy</title>
+  <link rel="stylesheet" href="multiplayer.css">
+  <script src="multiplayer.js" defer></script>
+  <link rel="icon" type="image/x-icon" href="../media/brain.png">
+</head>
+<body>
+  <div class="mp-container">
+    <h1>Multiplayer Quiz</h1>
+    <div id="match-info" class="hidden">You are playing against : <span id="opponent-name"></span></div>
+    <div class="waiting" id="waiting" > waiting for an oppennent...</div>
+    <button id="menu-btn" class="menu-btn" title="Menu">Menu</button>
+    <div id="status" class="status">server connection…</div>
+
+    <div id="question-box" class="question-box hidden">
+      <div id="question-counter" class="question-counter">Question: 1/10</div>
+      <p id="question-text" class="question"></p>
+      <div id="answers" class="answers"></div>
+      <div class="timer-score">
+        <div>Time : <span id="timer">0</span>s</div>
+        <div>You : <span id="score-you">0</span></div>
+        <div>Opponent : <span id="score-them">0</span></div>
+      </div>
+    </div>
+    <div id="result-screen" class="result hidden">
+      <h2 id="result-text"></h2>
+      <p id="final-score-you"></p>
+      <p id="final-score-them"></p>
+      <button id="play-again" class="btn">Replay</button>
+      <button id="back-menu" class="btn">Menu</button>
+    </div>
+  </div>
+</body>
+</html>

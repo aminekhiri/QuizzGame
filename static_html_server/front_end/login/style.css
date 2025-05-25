@@ -1,0 +1,193 @@
+/* style.css */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('../media/background-1.png') center center no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #fff;
+    min-height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* Styles pour le logo */
+.logo-container {
+    position: absolute;
+    top: 50px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.logo {
+    max-width: 240px;
+    height: auto;
+}
+
+/* Crée un espace pour pousser le formulaire au centre */
+.spacer {
+    flex-grow: 1;
+    min-height: 100px;
+}
+
+/* Style du formulaire */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    background: rgba(33, 24, 73, 1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 360px;
+    color: #f0e9ff;
+    margin: auto; /* Centre verticalement et horizontalement */
+    position: relative;
+    z-index: 2;
+    bottom: 25%; 
+}
+
+/* Style du message d'erreur */
+.error-message {
+    color: #ff4d4d;
+    background-color: rgba(255, 77, 77, 0.1);
+    border-left: 3px solid #ff4d4d;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    width: 100%;
+    box-sizing: border-box;
+    display: none; /* Caché par défaut */
+}
+
+/* Quand le message d'erreur est visible */
+.error-message.visible {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 30px;
+    color: #f0e9ff;
+}
+
+label {
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.form-container input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.6rem 0.8rem;
+    margin-bottom: 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1em;
+    background-color: #f5f0ff;
+    color: #333;
+    transition: box-shadow 0.3s ease;
+}
+
+#register-btn {
+    margin-bottom: 1rem; 
+}
+
+.password-wrapper {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-bottom: 1.5rem; /* pour séparer du bouton Login */
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #bb86fc;
+}
+
+button {
+    font-size: 1em;
+    background-color: #7e57c2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button:hover {
+    background-color: #9575cd;
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+#inscription {
+    background: none;
+    text-decoration: underline;
+    color: #bb86fc;
+}
+
+#forgot {
+    background: none;
+    text-decoration: underline;
+    color: #bb86fc;
+}
+
+#register-btn {
+    background: none;
+    text-decoration: underline;
+    text-align: center;
+    color: #bb86fc;
+}
+
+.password-wrapper input {
+    margin-bottom: 0;
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    width: 28px;
+    height: 24px;
+    z-index: 2;
+}
+
+/* Titre */
+.form-container h1 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 1.8em;
+    color: #fff;
+}
+
+#login {
+    margin-bottom: 1.5rem; /* espace entre Login et Register */
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
+
+
+}

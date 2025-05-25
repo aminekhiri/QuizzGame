@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <script src="admin.js" defer></script>
+  <link rel="stylesheet" href="admin.css" />
+  <link rel="icon" type="image/x-icon" href="../media/brain.png"/>
+</head>
+<body>    
+  <button id="logout-btn" class="logout-btn" title="Logout">Logout</button>
+  <button id="menu-btn" class="menu-btn">Menu</button>
+  <div class="admin-container">
+
+    <h1>Admin Dashboard</h1><br><br>
+    <h2>Users List</h2>
+    <p id="admin-message" class="error-message"></p>
+
+    <ul id="users-list"></ul>
+  </div>
+  
+  <!-- Modal de confirmation -->
+  <div id="confirmation-modal" class="modal-overlay">
+    <div class="modal-container">
+      <h3 class="modal-title">Confirmation</h3>
+      <p class="modal-message" id="modal-message">Are you sure you want to delete this account?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" id="modal-btn-cancel">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="modal-btn-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

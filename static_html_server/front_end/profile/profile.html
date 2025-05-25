@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Quizzy – My profile</title>
+  <link rel="stylesheet" href="profile.css">
+  <link rel="icon" type="image/x-icon" href="../media/brain.png">
+</head>
+<body>
+  <div class="profile-container">
+    <h1>My Profile</h1>
+
+    <div class="profile-item">
+      Username : <strong id="p-username">—</strong>
+    </div>
+    <div class="profile-item">
+      First name : <strong id="p-firstname">—</strong>
+    </div>
+    <div class="profile-item">
+      Last name : <strong id="p-lastname">—</strong>
+    </div>
+
+    <!-- <h2>Best scores</h2>
+    <ul id="scores-list" class="scores-list">
+      <li>No best score recorded</li>
+    </ul> -->
+
+    <div>
+      <button id="delete-account-btn" class="delete-btn">
+        Delete my account
+      </button>
+    </div>
+
+    <a href="../quizz/quizz.html" class="back">← Back</a>
+  </div>
+
+  <!-- Modal de confirmation -->
+  <div id="confirmation-modal" class="modal-overlay">
+    <div class="modal-container">
+      <h3 class="modal-title">Confirmation</h3>
+      <p class="modal-message" id="modal-message">Are you sure you want to delete your account? This action is irreversible.</p>
+      <div class="modal-buttons">
+        <button class="modal-btn modal-btn-cancel" id="modal-btn-cancel">Cancel</button>
+        <button class="modal-btn modal-btn-confirm" id="modal-btn-confirm">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include ton script APRÈS le body -->
+  <script src="profile.js"></script>
+</body>
+</html>

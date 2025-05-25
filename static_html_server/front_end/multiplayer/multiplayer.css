@@ -1,0 +1,120 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('../media/background-multi.png') center center no-repeat;
+    background-size: cover;
+    color: #fff;
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.mp-container {
+    background: rgba(33,24,73,1);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.status, .match, .result {
+    margin-bottom: 1rem;
+    font-size: 1.1em;
+}
+
+.question-box {
+    margin-top: 1rem;
+}
+
+.question-counter {
+    font-size: 1em;
+    margin-bottom: 1rem;
+    color: #9575cd;
+    font-weight: bold;
+}
+
+.question {
+    font-size: 1.2em;
+    margin-bottom: 1rem;
+}
+
+.answers button {
+    display: block;
+    width: 100%;
+    padding: 0.6em;
+    margin: 0.3em 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.answers button.correct {
+    background-color: #4CAF50;
+}
+
+.answers button.wrong {
+    background-color: #f44336;
+}
+
+.timer-score {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    font-size: 0.9em;
+}
+
+.next-btn, .btn {
+    padding: 0.6em 1.2em;
+    margin-top: 1rem;
+    border: none;
+    border-radius: 8px;
+    background-color: #9575cd;
+    color: #fff;
+    cursor: pointer;
+}
+
+.next-btn.hidden,
+.match.hidden,
+.question-box.hidden,
+.result.hidden {
+    display: none;
+}
+
+.answers button.selected {
+    border: 2px solid #ffd700; /* exemple : contour jaune */
+    background-color: rgba(206, 203, 27, 0.2); /* exemple : fond blanc transparent */
+}
+
+.answers button.correct {
+    background-color: #4CAF50 !important; /* vert */
+    color: #fff;
+}
+
+.answers button.wrong {
+    background-color: #f44336 !important; /* rouge */
+    color: #fff;
+}
+  
+
+.menu-btn {
+    position: absolute;
+    top: 20px;
+    left: 47%;
+    display: inline-block;
+    padding: 10px 25px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #7e57c2;
+    color: #fff;
+    transition: background-color 0.2s;
+  }
+  
+.hidden {
+    display: none;
+}

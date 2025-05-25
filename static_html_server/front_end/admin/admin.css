@@ -1,0 +1,272 @@
+/* admin.css */
+
+/* Page background to match site gradient */
+body {
+    background: url('../media/background-1.png') center center no-repeat;
+    background-size: cover;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 1.5em;
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    background-color: #7e57c2;
+    display: inline-block;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 25px;
+}
+
+.menu-btn {
+    position: absolute;
+    top: 20px;
+    left: 47%;
+    display: inline-block;
+    padding: 10px 25px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    border-radius: 6px;
+    background-color: #7e57c2;
+    color: #fff;
+    transition: background-color 0.2s;
+
+}
+
+/* Admin Dashboard Container */
+.admin-container {
+    align-items: center;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    max-width: 960px;
+    margin: 40px auto;
+    padding: 20px;
+    background: rgba(33,24,73,0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    width: 80vw;
+    height: 80vh;
+
+}
+
+/* Main Title centered */
+h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #f0e9ff;
+    text-align: center;
+    }
+
+
+h2 {
+    font-size: 1.8rem;
+    margin: 20px 0 10px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
+    text-align: left;
+}
+
+/* Users list grid */
+#users-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Individual user card */
+#users-list li {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 10px;
+    border-left: 6px solid #6a11cb;
+    transition: transform 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    white-space: pre-line;
+    font-size: 0.9rem;
+}
+
+#users-list li:hover {
+    transform: translateY(-4px);
+}
+
+/* Username styling */
+#users-list li .user-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #2575fc;
+}
+
+/* Meta info styling */
+#users-list li .user-info {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 8px;
+}
+
+/* Admin badge */
+#users-list li .badge {
+    align-self: flex-start;
+    padding: 4px 10px;
+    background: #6a11cb;
+    color: #fff;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    margin-top: auto;
+}
+
+/* Buttons styling */
+button, .button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 10px 24px;
+    margin: 8px 4px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button:hover, .button:hover {
+    transform: scale(1.03);
+}
+
+/* Primary button (e.g., Admin Dashboard, Logout) */
+.button-primary {
+    background: #6a11cb;
+    color: #fff;
+}
+
+.button-primary:hover {
+    background: #2575fc;
+}
+
+.error-message {
+    color: #fff;       
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    min-height: 1.2em;     
+  }
+  
+.delete-user-btn {
+  padding: 0.4rem 0.8rem;
+  background-color: #c62828;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.delete-user-btn:hover {
+  background-color: #e53935;
+}
+
+/* Styles pour le modal de confirmation */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container {
+    background: #322b5f;
+    border-radius: 12px;
+    padding: 30px;
+    width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: modalFadeIn 0.3s;
+    color: white;
+}
+
+
+
+.modal-title {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #bb86fc;
+}
+
+.modal-message {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+}
+
+.modal-btn-cancel {
+    background-color: #4e4e4e;
+    color: white;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #5a5a5a;
+}
+
+.modal-btn-confirm {
+    background-color: #c62828;
+    color: white;
+}
+
+.modal-btn-confirm:hover {
+    background-color: #d32f2f;
+}
+
+/* Style pour le bouton unique de redirection dans le modal */
+.modal-btn-redirect {
+  background-color: #7e57c2 !important; /* violet qui correspond à la charte graphique */
+  color: white;
+  padding: 12px 25px !important;
+  font-weight: bold;
+}
+
+.modal-btn-redirect:hover {
+  background-color: #9575cd !important;
+  transform: translateY(-3px);
+}

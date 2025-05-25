@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quizzy</title>
+    <link rel="stylesheet" href="../login/style.css">   
+    <link rel="icon" type="image/x-icon" href="../media/brain.png">
+
+</head>
+
+<body>
+
+    <!-- conteneur pour le logo-->
+    <div class="logo-container">
+        <img src="../media/logo.png" alt="Quizzy Logo" class="logo">
+    </div>
+
+    <!-- Espace pour centrer verticalement le formulaire -->
+    <div class="spacer"></div>
+    
+    <div class="form-container">
+        <h1>Log in</h1> 
+
+        <!-- Message d'erreur qui s'affichera en cas d'échec de connexion -->
+        <div id="error-message" class="error-message"></div>
+
+        <label for="identifiant">Enter the username</label> 
+        <input type="text" placeholder="username" id="identifiant" required></input>
+
+        <label for="password">Enter the password</label> 
+        <div class="password-wrapper">
+            <input type="password" placeholder="psswd" id="password" required>
+            <img class="toggle-eye" onclick="togglePassword()" src="../media/eye-open.png" alt="Afficher le mot de passe" draggable="false">
+        </div>
+        
+        <button type="submit" id="login">Login</button><br>
+
+        <button id="register-btn" type="button">Register</button>
+
+        <script src="../login/script.js"></script>
+    </div>
+
+
+</body>
