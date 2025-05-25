@@ -13,6 +13,40 @@ justify-content: center;
 align-items: center;
 }
 
+/* Messages d'erreur et de succès */
+.message {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  font-size: 0.9em;
+  box-sizing: border-box;
+  display: none;
+  transition: all 0.3s ease;
+}
+
+.error-message {
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.1);
+  border-left: 3px solid #ff4d4d;
+}
+
+.success-message {
+  color: #4CAF50;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-left: 3px solid #4CAF50;
+}
+
+.message.visible {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 /* Conteneur du formulaire en colonne */
 .form-container {
 display: flex;

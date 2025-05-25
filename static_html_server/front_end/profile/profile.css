@@ -1,4 +1,3 @@
-
 html, body {
     margin: 0;
     padding: 0;
@@ -6,35 +5,40 @@ html, body {
     /* dégradé violet de fond */
     background: url('../media/background-solo.png') center center no-repeat;
     background-size: cover;
+    background-attachment: fixed;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profile-container {
-    max-width: 400px;
-    margin: 60px auto;
-    padding: 20px;
+    max-width: 600px;  
+    margin: 0;
+    padding: 30px 40px;  
     background: rgba(33,24,73,1);
     border-radius: 8px;
     color: #fff;
     font-family: 'Segoe UI', sans-serif;
-  }
-  .profile-container h1 {
+    width: 550px;  
+}
+.profile-container h1 {
     margin-bottom: 20px;
-  }
-  .profile-item {
+}
+.profile-item {
     margin: 10px 0;
     font-size: 1.1em;
-  }
-  .profile-item span {
+}
+.profile-item span {
     font-weight: bold;
-  }
-  a.back {
+}
+a.back {
     display: inline-block;
     margin-top: 20px;
     color: #bb86fc;
     text-decoration: none;
-  }
+}
 
 .delete-btn {
   margin: 1.5rem 0;
@@ -56,4 +60,91 @@ html, body {
 
 .delete-btn:active {
   transform: scale(0.98);
+}
+
+/* Styles pour le modal de confirmation */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container {
+    background: #322b5f;
+    border-radius: 12px;
+    padding: 30px;
+    width: 400px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: modalFadeIn 0.3s;
+}
+
+
+.modal-title {
+    font-size: 1.4rem;
+    margin-bottom: 15px;
+    color: #bb86fc;
+}
+
+.modal-message {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+}
+
+.modal-btn-cancel {
+    background-color: #4e4e4e;
+    color: white;
+}
+
+.modal-btn-cancel:hover {
+    background-color: #5a5a5a;
+}
+
+.modal-btn-confirm {
+    background-color: #c62828;
+    color: white;
+}
+
+.modal-btn-confirm:hover {
+    background-color: #d32f2f;
+}
+
+/* Style pour le bouton unique de redirection dans le modal */
+.modal-btn-redirect {
+  background-color: #673ab7;
+  color: white;
+  font-weight: 500;
+  width: 100%;
+  padding: 12px !important;
+}
+
+.modal-btn-redirect:hover {
+  background-color: #7e57c2;
 }

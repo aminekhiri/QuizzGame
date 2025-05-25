@@ -2,13 +2,20 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quizz Game</title>
+  <title>Quizzy</title>
   <link rel="stylesheet" href="register.css">
   <link rel="icon" type="image/x-icon" href="../media/brain.png">
 </head>
 <body>
   <div class="form-container">
     <h1>Register</h1>
+    
+    <!-- Message d'erreur -->
+    <div id="error-message" class="message error-message"></div>
+    
+    <!-- Message de succès -->
+    <div id="success-message" class="message success-message"></div>
+    
     <label for="first_name">First name</label>
     <input id="first_name" type="text" required>
 

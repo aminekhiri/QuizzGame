@@ -28,6 +28,13 @@ body {
     margin-top: 1rem;
 }
 
+.question-counter {
+    font-size: 1em;
+    margin-bottom: 1rem;
+    color: #9575cd;
+    font-weight: bold;
+}
+
 .question {
     font-size: 1.2em;
     margin-bottom: 1rem;

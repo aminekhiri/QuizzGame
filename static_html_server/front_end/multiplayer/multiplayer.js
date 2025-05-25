@@ -6,6 +6,12 @@ let socket;
 let yourScore = 0;
 let theirScore = 0;
 let timerInterval = null;
+let currentQuestionNumber = 1;
+const totalQuestions = 10; // Nombre total de questions dans le quiz
+
+// Variables pour gestion des questions et réponses
+let selectedAnswer = null;
+let selectedBtn = null;
 
 function show(el) { el.classList.remove('hidden'); }
 function hide(el) { el.classList.add('hidden'); }
@@ -24,14 +30,14 @@ function startTimer(sec) {
       // désactive les boutons
       disableAnswerButtons();
 
-      if (selectedAnswer===null){
-              // envoie la dernière réponse mémorisée (ou null si on a répondu à rien)
-      socket.send(JSON.stringify({
-        type:   'answer',
-        answer: selectedAnswer
-      }));
+      // si jamais l'utilisateur n'a **jamais** cliqué,
+      // on envoie quand même une réponse nulle pour qu'il ne soit pas bloqué
+      if (selectedAnswer === null) {
+        socket.send(JSON.stringify({
+          type:   'answer',
+          answer: null
+        }));
       }
-
     }
   }, 1000);
 }
@@ -39,12 +45,16 @@ function startTimer(sec) {
 function renderQuestion(q) {
   const txt = document.getElementById('question-text');
   const ans = document.getElementById('answers');
+  const questionCounter = document.getElementById('question-counter');
 
   // reset
   ans.innerHTML     = '';
   selectedAnswer    = null;
   selectedBtn       = null;
 
+  // Mettre à jour le compteur de questions
+  questionCounter.textContent = `Question: ${currentQuestionNumber}/${totalQuestions}`;
+  
   txt.textContent   = q.question;
   startTimer(q.time);
 
@@ -58,13 +68,18 @@ function renderQuestion(q) {
       selectedBtn    = btn;
       selectedAnswer = choice;
       btn.classList.add('selected');
-     
-      //on tente 
-      socket.send(JSON.stringify({
-        type: 'answer',
+      
+      if (timerInterval) { 
+        socket.send(JSON.stringify({
+        type:   'answer',
         answer: selectedAnswer
-      }));
-    };
+        }));
+        // désactive les boutons de réponse
+        disableAnswerButtons();
+
+      }
+
+    }
     ans.appendChild(btn);
   });
 }
@@ -98,7 +113,6 @@ globalThis.addEventListener('DOMContentLoaded', () => {
   const status       = document.getElementById('status');
   const matchInfo    = document.getElementById('match-info');
   const questionBox  = document.getElementById('question-box');
-  const nextBtn      = document.getElementById('next-btn');
   const playAgain    = document.getElementById('play-again');
   const backMenu     = document.getElementById('back-menu');
   const opponentName = document.getElementById('opponent-name');
@@ -118,6 +132,8 @@ globalThis.addEventListener('DOMContentLoaded', () => {
     const msg = JSON.parse(ev.data);
     switch (msg.type) {
       case 'matched':
+        // Réinitialiser le compteur au début d'une nouvelle partie
+        currentQuestionNumber = 1;
         document.getElementById('waiting').style.display = 'none'; //on cache le waiting
         status.style.display = 'none'; //on cache le server connection
 
@@ -129,11 +145,10 @@ globalThis.addEventListener('DOMContentLoaded', () => {
       case 'question':
         hide(matchInfo);
         show(questionBox);
-        hide(nextBtn);
         renderQuestion(msg);
         break;
       case 'scores':
-        updateScores(msg);
+
         //on desactive les boutons de réponse
         disableAnswerButtons();
         document.querySelectorAll('.answers button').forEach(b => {
@@ -144,8 +159,9 @@ globalThis.addEventListener('DOMContentLoaded', () => {
             if (selectedBtn && !selectedBtn.classList.contains('correct')) {
                 selectedBtn.classList.add('wrong');
             }
-            document.getElementById('score-you').textContent  = msg.you;
-            document.getElementById('score-them').textContent = msg.them;
+            currentQuestionNumber++;
+            // Mettre à jour les scores
+            updateScores(msg);
         break;
       case 'end':
         showResult(msg.outcome);
@@ -156,11 +172,12 @@ globalThis.addEventListener('DOMContentLoaded', () => {
   socket.onerror = () => status.textContent = 'Erreur de connexion au serveur.';
   socket.onclose = () => status.textContent = 'Connexion fermée.';
 
-  nextBtn.addEventListener('click', () => {
-    socket.send(JSON.stringify({ type: 'next' }));
-  });
 
-  playAgain.addEventListener('click', () => location.reload());
+  playAgain.addEventListener('click', () => {
+    // Réinitialiser le compteur de questions
+    currentQuestionNumber = 1;
+    location.reload();
+  });
   backMenu.addEventListener('click', () => window.location.href = '../menu/menu.html');
 });
 

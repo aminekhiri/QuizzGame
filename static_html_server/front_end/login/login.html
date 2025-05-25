@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title> Quizz Game </title>
+    <title>Quizzy</title>
     <link rel="stylesheet" href="../login/style.css">   
     <link rel="icon" type="image/x-icon" href="../media/brain.png">
 
@@ -10,12 +10,21 @@
 
 <body>
 
+    <!-- conteneur pour le logo-->
+    <div class="logo-container">
+        <img src="../media/logo.png" alt="Quizzy Logo" class="logo">
+    </div>
 
-
+    <!-- Espace pour centrer verticalement le formulaire -->
+    <div class="spacer"></div>
+    
     <div class="form-container">
         <h1>Log in</h1> 
 
-        <label for="identifiant">Enter the id</label> 
+        <!-- Message d'erreur qui s'affichera en cas d'échec de connexion -->
+        <div id="error-message" class="error-message"></div>
+
+        <label for="identifiant">Enter the username</label> 
         <input type="text" placeholder="username" id="identifiant" required></input>
 
         <label for="password">Enter the password</label> 

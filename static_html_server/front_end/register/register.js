@@ -22,9 +22,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const last_name  = document.getElementById('last_name').value.trim();
       const username   = document.getElementById('username').value.trim();
       const password   = document.getElementById('password').value;
+      
+      // Récupérer les éléments pour afficher les messages
+      const errorMsg = document.getElementById('error-message');
+      const successMsg = document.getElementById('success-message');
+      
+      // Cacher les messages précédents
+      errorMsg.textContent = '';
+      errorMsg.classList.remove('visible');
+      successMsg.textContent = '';
+      successMsg.classList.remove('visible');
   
       if (!first_name || !last_name || !username || !password) {
-        alert("Merci de remplir tous les champs.");
+        errorMsg.textContent = "Please fill in all fields.";
+        errorMsg.classList.add('visible');
         return;
       }
   
@@ -37,18 +48,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
   
         if (res.status === 201) {
-          alert("Inscription réussie ! Vous pouvez maintenant vous connecter.");
-          window.location.href = "../login/login.html";
-        } else if (res.status === 409) {
+          // Afficher le message de succès
+          successMsg.innerHTML = "Account created successfully! You can now <a href='../login/login.html'>log in</a>.";
+          successMsg.classList.add('visible');
+          
+          // Réinitialiser le formulaire
+          document.getElementById('first_name').value = '';
+          document.getElementById('last_name').value = '';
+          document.getElementById('username').value = '';
+          document.getElementById('password').value = '';
+          
+          // Rediriger après un délai pour laisser l'utilisateur voir le message
+          setTimeout(() => {
+            window.location.href = "../login/login.html";
+          }, 3000);
+        } else if (res.status === 500) {
           const { message } = await res.json();
-          alert(message);
+          errorMsg.textContent = "Username already exists. Please choose another one.";
+          errorMsg.classList.add('visible');
         } else {
           const { message } = await res.json();
-          alert("Erreur : " + message);
+          errorMsg.textContent = "Error: " + message;
+          errorMsg.classList.add('visible');
         }
       } catch (err) {
         console.error(err);
-        alert("Impossible de contacter le serveur.");
+        errorMsg.textContent = "Unable to contact the server. Please try again later.";
+        errorMsg.classList.add('visible');
       }
     });
   });

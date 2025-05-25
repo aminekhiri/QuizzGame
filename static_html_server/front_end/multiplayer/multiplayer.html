@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Quizz Game</title>
+  <title>MultiQuizzy</title>
   <link rel="stylesheet" href="multiplayer.css">
   <script src="multiplayer.js" defer></script>
   <link rel="icon" type="image/x-icon" href="../media/brain.png">
@@ -16,6 +16,7 @@
     <div id="status" class="status">server connection…</div>
 
     <div id="question-box" class="question-box hidden">
+      <div id="question-counter" class="question-counter">Question: 1/10</div>
       <p id="question-text" class="question"></p>
       <div id="answers" class="answers"></div>
       <div class="timer-score">
@@ -23,7 +24,6 @@
         <div>You : <span id="score-you">0</span></div>
         <div>Opponent : <span id="score-them">0</span></div>
       </div>
-      <button id="next-btn" class="next-btn hidden">Next Question</button>
     </div>
     <div id="result-screen" class="result hidden">
       <h2 id="result-text"></h2>

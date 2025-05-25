@@ -1,29 +1,39 @@
-/* quizz.css */
+/* quizz.css - Fichier autonome, plus de dépendance avec style.css */
 
+/* Styles de base */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  /* dégradé violet de fond */
+  width: 100%;
   background: url('../media/background-solo.png') center center no-repeat;
   background-size: cover;
+  background-attachment: fixed;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #fff;
+  min-height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .quiz-container {
   max-width: 600px;
-  margin: 40px auto;
+  margin: 0;  /* Remplacé auto par 0 pour le centrage flexbox */
   padding: 20px 30px;
   background: rgba(33,24,73,0.95);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  position: relative; /* Pour que les boutons positionnés en absolute restent dans ce container */
+  width: 100%;       /* Ajoute cette propriété pour s'assurer qu'il prend la largeur */
 }
 
 .quiz-container h1 {
   margin-bottom: 20px;
   color: #f0e9ff;
   padding: 10px;
+  
 }
 
 .question {
@@ -61,34 +71,43 @@ html, body {
   border-color: #e53935;
 }
 
-#next-btn {
+/* Styles de bouton génériques */
+button {
+  font-size: 1em;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  background-color: #7e57c2;
+  color: #fff;
+  transition: background-color 0.3s ease, transform 0.2s;
+  box-sizing: border-box;
+}
+
+button:hover {
+  background-color: #9575cd;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Style spécifique pour les boutons de quiz */
+#next-btn, #new-quiz-btn, #start-btn, #quit-btn {
   display: inline-block;
   margin-top: 20px;
   padding: 12px 24px;
   font-size: 1em;
-  cursor: pointer;
-  border: none;
   border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.15);
+  background-color: #7e57c2;
   color: #fff;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
+  width: auto;
 }
 
-#new-quiz-btn {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 24px;
-  font-size: 1em;
-  cursor: pointer;
-  border: none;
-  border-radius: 6px;
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  transition: background-color 0.2s;
-}
-
-#next-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+#next-btn:hover, #new-quiz-btn:hover, #start-btn:hover, #quit-btn:hover {
+  background-color: #9575cd;
+  transform: scale(1.05);
 }
 
 .profile-btn {
@@ -147,4 +166,35 @@ html, body {
 
 #hud {
   display: none;
+}
+
+/* Styles pour les formulaires et inputs */
+input, select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  background-color: #f5f0ff;
+  color: #333;
+  transition: box-shadow 0.3s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 10px #bb86fc;
+}
+
+label {
+  font-size: 1.1em;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* Style des titres */
+h1, h2, h3 {
+  margin-bottom: 20px;
+  color: #f0e9ff;
 }

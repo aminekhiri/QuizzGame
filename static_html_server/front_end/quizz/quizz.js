@@ -167,14 +167,14 @@ function showNextQuestion() {
         document.getElementById('score').textContent = score;
       
         // === mise à jour du bestScore pour la catégorie et la difficulté ===
-        const currentUser = localStorage.getItem('username') || '';
+        const currentUser = sessionStorage.getItem('username') || '';
         const catKey      = currentCategory   || 'all';
         const diffKey     = currentDifficulty || 'all';
         const storageKey  = `bestScore_${currentUser}_${catKey}_${diffKey}`;
       
-        const prev = parseInt(localStorage.getItem(storageKey) || '0', 10);
+        const prev = parseInt(sessionStorage.getItem(storageKey) || '0', 10);
         if (score > prev) {
-          localStorage.setItem(storageKey, score.toString());
+          sessionStorage.setItem(storageKey, score.toString());
         }
       }
       else {
@@ -216,54 +216,89 @@ function startTimer() {
 }
 
 
-async function _completeQuiz() {
-  if (!quizCompleted) {
-    return;
-  }
-  try {
+//partie que je n'ai pas réussi à faire fonctionner
+// Cette fonction est appelée pour enregistrer les résultats du quiz
+// async function completeQuiz() {
+//   if (!quizCompleted) {
+//     return;
+//   }
+//   try {
+//     // On récupère la catégorie et la difficulté sélectionnées
+//     const payload = {
+//       category_code   : currentCategory   || 'all',
+//       difficulty_level: currentDifficulty || 'all',
+//       question_count  : MAX_QUESTIONS,
+//       total_score     : score
+//     };
 
-    const token = localStorage.getItem("jwt");
-    if (!token) {
-      alert("Vous n'êtes pas connecté")
-      return;
-    }
+//     console.log({ currentCategory, currentDifficulty, score });
 
-    // On récupère la catégorie et la difficulté sélectionnées
-    const payload = {
-      category_code   : currentCategory   || 'all',
-      difficulty_level: currentDifficulty || 'all',
-      question_count:   MAX_QUESTIONS,
-      total_score     : score
-    };
-    // Ici on suppose que le serveur saura transformer
-    // categoryCode → category_id, difficultyCode → difficulty_id
-    const res = await fetch("https://localhost:3000/api/quiz/complete", {
-      method:      "POST",
-      headers:     { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload)
-    });
+//     // Send authenticated request
+//     console.log("Sending quiz results to server...");
+//     const token = sessionStorage.getItem('jwt');
+//     const headers = {
+//       'Content-Type': 'application/json'
+//     };
+    
+//     if (token) {
+//       headers['Authorization'] = `Bearer ${token}`;
+//     }
+    
+//     const res = await fetch("https://localhost:3000/api/quiz/complete", {
+//       method: 'POST',
+//       body: JSON.stringify(payload),
+//       credentials: 'include',
+//       headers: headers
+//     });
 
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.message || "Erreur enregistrement quiz");
-    }
+//     // Debug the response
+//     console.log("Response status:", res.status);
+
+//     // Essayons d'abord de lire le corps de la réponse en tant que texte pour le débogage
+//     const responseText = await res.text();
+//     console.log("Raw response:", responseText);
+    
+//     // Puis convertir en JSON si possible
+//     let responseData;
+//     try {
+//       responseData = JSON.parse(responseText);
+//     } catch (jsonErr) {
+//       console.error("Invalid JSON response:", jsonErr);
+//       throw new Error("Server returned invalid JSON");
+//     }
+    
+//     if (!res.ok) {
+//       console.log("Erreur enregistrement quiz : ", responseData);
+//       throw new Error(responseData.message || "Erreur enregistrement quiz");
+//     }
+    
+//     // Traitement de la réponse si nécessaire
+//     console.log("Quiz enregistré avec succès:", responseData);
+
+//   } catch (err) {
+//     console.error(err);
+//     // Ne pas afficher l'erreur de session expirée, car fetchAuth gère déjà la redirection
+//     if (err.message !== 'Session expirée. Veuillez vous reconnecter.') {
+//       alert(err.message);
+//     }
+//   }
+
+//   // Afficher l'écran final
+//   showFinalScreen();
 
 
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-
-  // Afficher l'écran final
-  showFinalScreen();
-
-
-}
+// }
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // Vérifier l'authentification
+  const token = sessionStorage.getItem('jwt');
+  if (!token) {
+    console.warn('Not logged in, redirecting to login');
+    window.location.href = '../login/login.html';
+    return;
+  }
+  
   await loadCategories();    // remplit #category-select
   loadDifficulties();        // remplit #difficulty-select
 
@@ -322,6 +357,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
 
+  const jwt = sessionStorage.getItem('jwt');
+  if (!jwt) {
+    console.warn("No JWT token found in sessionStorage. Authentication might fail.");
+  }
+
 });
 
 //le bouton quit s'affiche quand 
@@ -331,10 +371,12 @@ async function doLogout() {
   } catch { /* ignore, on veut juste effacer quand même */ }
 
   // on vide les données locales
-  localStorage.removeItem("username");
-  localStorage.removeItem("password");
+  sessionStorage.removeItem("username");
+  sessionStorage.removeItem("password");
+  sessionStorage.removeItem("jwt");
+  
   // si tu stockes bestScore_…, tu peux garder ou tout vider :
-  // Object.keys(localStorage).forEach(k => k.startsWith('bestScore_') && localStorage.removeItem(k));
+  // Object.keys(sessionStorage).forEach(k => k.startsWith('bestScore_') && sessionStorage.removeItem(k));
 
   // redirection vers la page de connexion
   window.location.href = "../login/login.html";
@@ -390,3 +432,4 @@ document.getElementById('profile-btn')
   .addEventListener('click', () => {
     window.location.href = '../profile/profile.html';
   });
+
